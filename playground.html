@@ -1,0 +1,2724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Playground - Code Arena</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: linear-gradient(135deg, #0a0a12 0%, #12121c 50%, #0a0a12 100%);
+      color: #e8e8f0;
+      min-height: 100vh;
+    }
+
+    /* Header with gradient */
+    header {
+      padding: 15px 25px;
+      background: linear-gradient(90deg, rgba(18, 18, 28, 0.95), rgba(26, 26, 40, 0.95));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .logo-icon {
+      font-size: 1.6rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .logo span {
+      background: linear-gradient(90deg, #00ff88, #4488ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      background: rgba(42, 42, 58, 0.5);
+      border: 1px solid #3a3a4a;
+      color: #8888a0;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .back-btn:hover {
+      border-color: #00ff88;
+      color: #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+      transform: translateX(-3px);
+    }
+
+    /* Tabs with glow */
+    .mode-tabs {
+      display: flex;
+      gap: 12px;
+      padding: 18px 25px;
+      background: rgba(15, 15, 24, 0.9);
+      border-bottom: 1px solid rgba(42, 42, 58, 0.5);
+    }
+
+    .tab {
+      padding: 14px 28px;
+      background: linear-gradient(145deg, #1a1a28, #141420);
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+
+    .tab:hover::before {
+      transform: translateX(100%);
+    }
+
+    .tab:hover {
+      border-color: #4488ff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(68, 136, 255, 0.2);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #0a0a12;
+      border-color: #00ff88;
+      font-weight: 700;
+      box-shadow: 0 5px 25px rgba(0, 255, 136, 0.3);
+    }
+
+    .tab-sandbox {
+      margin-left: auto;
+      background: linear-gradient(145deg, #2a1a38, #201030);
+      border-color: #6a4a8a;
+    }
+
+    .tab-sandbox:hover {
+      border-color: #aa66ff;
+      box-shadow: 0 5px 20px rgba(170, 102, 255, 0.2);
+    }
+
+    .tab-sandbox.active {
+      background: linear-gradient(135deg, #aa66ff, #8844dd);
+      border-color: #aa66ff;
+    }
+
+    /* Main playground grid - each column is independent */
+    .playground {
+      display: grid;
+      grid-template-columns: 240px 1fr 1fr;
+      height: calc(100vh - 120px);
+      min-height: 500px;
+      align-items: stretch;
+    }
+
+    .playground>* {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Levels sidebar */
+    .levels-panel {
+      background: linear-gradient(180deg, #0f0f18, #0a0a12);
+      border-right: 1px solid rgba(42, 42, 58, 0.5);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #2a2a3a #0a0a12;
+    }
+
+    .levels-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .levels-panel::-webkit-scrollbar-track {
+      background: #0a0a12;
+    }
+
+    .levels-panel::-webkit-scrollbar-thumb {
+      background: #2a2a3a;
+      border-radius: 3px;
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      background: linear-gradient(90deg, rgba(26, 26, 40, 0.95), rgba(18, 18, 28, 0.95));
+      border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .level-list {
+      padding: 10px;
+    }
+
+    .level-item {
+      padding: 10px 12px;
+      background: linear-gradient(145deg, #141420, #12121c);
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .level-item:hover {
+      border-color: #4488ff;
+      transform: translateX(4px);
+      box-shadow: 0 2px 12px rgba(68, 136, 255, 0.15);
+    }
+
+    .level-item.active {
+      border-color: #00ff88;
+      background: linear-gradient(145deg, #1a2a1a, #152015);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.12);
+    }
+
+    .level-item.completed {
+      border-left: 3px solid #00ff88;
+    }
+
+    .level-item.completed .level-num::before {
+      content: '✓ ';
+      color: #00ff88;
+    }
+
+    .level-num {
+      font-size: 0.65rem;
+      color: #6a6a8a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .level-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .level-desc {
+      font-size: 0.75rem;
+      color: #7a7a9a;
+      line-height: 1.3;
+    }
+
+    /* ========== VISUAL BOARD (Canvas Area) ========== */
+    .canvas-area {
+      background: radial-gradient(ellipse at center, #12121c 0%, #0a0a12 100%);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(42, 42, 58, 0.5);
+      overflow: hidden;
+    }
+
+    /* Control buttons bar */
+    .controls {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, rgba(20, 20, 32, 0.98), rgba(28, 28, 44, 0.98));
+      border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* Canvas container - fixed size, centered */
+    #canvasContainer {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(0, 255, 136, 0.02) 0%, transparent 70%);
+      padding: 20px;
+    }
+
+    /* Canvas styling */
+    #canvasContainer canvas {
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      box-shadow:
+        0 0 30px rgba(0, 255, 136, 0.1),
+        0 0 60px rgba(68, 136, 255, 0.05),
+        0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Placeholder when no canvas */
+    #canvasContainer:empty::after {
+      content: 'Click "Run" to see your creation!';
+      color: #4a4a6a;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 40px;
+      border: 2px dashed rgba(42, 42, 58, 0.5);
+      border-radius: 12px;
+      background: rgba(10, 10, 18, 0.5);
+    }
+
+    /* Visualizer bar for music mode */
+    .visualizer-bar {
+      height: 60px;
+      background: linear-gradient(90deg, #0a0a12, #12121c);
+      border-top: 1px solid rgba(42, 42, 58, 0.5);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #0a0a12;
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(145deg, #2a2a3a, #1a1a28);
+      color: #e8e8f0;
+      border: 1px solid #3a3a4a;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(145deg, #3a3a4a, #2a2a38);
+      border-color: #4a4a5a;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #4488ff, #3366dd);
+      color: white;
+      box-shadow: 0 4px 15px rgba(68, 136, 255, 0.3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(68, 136, 255, 0.4);
+    }
+
+    /* Editor area - independent column */
+    .editor-area {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, #0f0f18, #0a0a12);
+      overflow: hidden;
+    }
+
+    .mission-box {
+      padding: 18px 22px;
+      background: linear-gradient(135deg, rgba(26, 42, 26, 0.9), rgba(20, 35, 20, 0.9));
+      border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mission-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #00ff88, #00aa66);
+    }
+
+    .mission-label {
+      font-size: 0.7rem;
+      color: #00ff88;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .mission-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #d0d0e0;
+    }
+
+    .editor-header {
+      padding: 14px 22px;
+      background: linear-gradient(90deg, rgba(26, 26, 40, 0.9), rgba(18, 18, 28, 0.9));
+      border-bottom: 1px solid rgba(42, 42, 58, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-name {
+      color: #6a6a8a;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-name::before {
+      content: '●';
+      color: #00ff88;
+      font-size: 0.6rem;
+    }
+
+    .editor-wrapper {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .line-numbers {
+      background: #08080e;
+      color: #4a4a5a;
+      padding: 18px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      text-align: right;
+      user-select: none;
+      min-width: 45px;
+      border-right: 1px solid rgba(42, 42, 58, 0.3);
+    }
+
+    #codeEditor {
+      flex: 1;
+      background: #0a0a12;
+      color: #e8e8f0;
+      border: none;
+      padding: 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      resize: none;
+      outline: none;
+      caret-color: #00ff88;
+    }
+
+    #codeEditor::selection {
+      background: rgba(0, 255, 136, 0.2);
+    }
+
+    .hint-box {
+      padding: 16px 22px;
+      background: linear-gradient(90deg, rgba(18, 18, 28, 0.9), rgba(12, 12, 20, 0.9));
+      border-top: 1px solid rgba(42, 42, 58, 0.5);
+      font-size: 0.85rem;
+      color: #7a7a9a;
+      line-height: 1.5;
+    }
+
+    .hint-box code {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 3px 8px;
+      border-radius: 5px;
+      color: #00ff88;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    /* Success overlay with animation */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .success-overlay.hidden {
+      display: none;
+    }
+
+    .success-card {
+      background: linear-gradient(145deg, #18182a, #12121c);
+      border: 2px solid #00ff88;
+      border-radius: 24px;
+      padding: 50px;
+      text-align: center;
+      max-width: 420px;
+      box-shadow:
+        0 0 50px rgba(0, 255, 136, 0.2),
+        0 25px 80px rgba(0, 0, 0, 0.5);
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .success-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: bounce 0.6s ease;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+
+    .success-card h2 {
+      margin-bottom: 12px;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #00ff88, #4488ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .success-card p {
+      color: #8888a0;
+      margin-bottom: 25px;
+      font-size: 1rem;
+    }
+
+    /* Visualizer bars */
+    .visualizer-bar {
+      height: 70px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 3px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .viz-bar {
+      width: 10px;
+      background: linear-gradient(to top, #00ff88, #4488ff);
+      border-radius: 3px;
+      transition: height 0.15s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Scrollbar for editor */
+    #codeEditor::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #codeEditor::-webkit-scrollbar-track {
+      background: #0a0a12;
+    }
+
+    #codeEditor::-webkit-scrollbar-thumb {
+      background: #2a2a3a;
+      border-radius: 4px;
+    }
+
+    #codeEditor::-webkit-scrollbar-thumb:hover {
+      background: #3a3a4a;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🎨</span>
+      <span>Creative Playground</span>
+    </div>
+    <a href="index.html" class="back-btn">← Back to Arena</a>
+  </header>
+
+  <div class="mode-tabs">
+    <div class="tab active" data-mode="art">🖼️ Code Art</div>
+    <div class="tab" data-mode="music">🎵 Algorithm DJ</div>
+    <div class="tab" data-mode="animation">🎬 Animation</div>
+    <div class="tab tab-sandbox" data-mode="sandbox">🧪 Sandbox</div>
+  </div>
+
+  <div class="playground">
+    <div class="levels-panel">
+      <div class="panel-header">📚 Challenges</div>
+      <div class="level-list" id="levelList"></div>
+    </div>
+
+    <div class="canvas-area">
+      <div class="controls">
+        <button class="btn btn-primary" id="runBtn">▶ Run</button>
+        <button class="btn btn-secondary" id="stopBtn">⏹ Stop</button>
+        <button class="btn btn-secondary" id="resetBtn">↺ Reset</button>
+        <button class="btn btn-success" id="checkBtn">✓ Check</button>
+      </div>
+      <div id="canvasContainer"></div>
+      <div class="visualizer-bar" id="visualizer" style="display:none;"></div>
+    </div>
+
+    <div class="editor-area">
+      <div class="mission-box">
+        <div class="mission-label">🎯 MISSION</div>
+        <div class="mission-text" id="missionText">Select a challenge to begin!</div>
+      </div>
+      <div class="editor-header">
+        <span class="file-name">creative.js</span>
+      </div>
+      <div class="editor-wrapper">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <textarea id="codeEditor" spellcheck="false"></textarea>
+      </div>
+      <div class="hint-box" id="hintBox">
+        <strong>💡 Tip:</strong> Complete challenges to learn creative coding step by step!
+      </div>
+    </div>
+  </div>
+
+  <div class="success-overlay hidden" id="successOverlay">
+    <div class="success-card">
+      <div class="success-icon">🎉</div>
+      <h2>Challenge Complete!</h2>
+      <p id="successMessage">Great work! You've learned a new technique.</p>
+      <button class="btn btn-primary" id="nextChallengeBtn">Next Challenge →</button>
+    </div>
+  </div>
+
+  <script>
+    // ========== CREATIVE PLAYGROUND WITH LEVELS ==========
+
+    const CREATIVE_LEVELS = {
+      art: [
+        {
+          id: 'art-1',
+          name: 'Your First Circle',
+          desc: 'Draw a circle on the canvas',
+          mission: 'Draw a circle at the center of the canvas. Use circle(x, y, size) where x=250, y=200, size=100',
+          hint: 'Use <code>circle(250, 200, 100)</code> to draw a circle',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  fill(0, 255, 136);
+  
+  // Draw a circle at center (250, 200) with size 100
+  // YOUR CODE HERE
+  
+}`,
+          check: (p) => {
+            // Check if they drew something in the center
+            const pixel = p.get(250, 200);
+            return pixel[1] > 200; // Check for green
+          }
+        },
+        {
+          id: 'art-2',
+          name: 'Color Mixing',
+          desc: 'Create colorful shapes',
+          mission: 'Draw 3 circles: RED at (100,200), GREEN at (250,200), BLUE at (400,200). Use fill(r,g,b) before each circle.',
+          hint: 'Use <code>fill(255,0,0)</code> for red, <code>fill(0,255,0)</code> for green, <code>fill(0,0,255)</code> for blue',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  noStroke();
+  
+  // Draw RED circle at (100, 200)
+  
+  // Draw GREEN circle at (250, 200)
+  
+  // Draw BLUE circle at (400, 200)
+  
+}`,
+          check: (p) => {
+            const r = p.get(100, 200);
+            const g = p.get(250, 200);
+            const b = p.get(400, 200);
+            return r[0] > 200 && g[1] > 200 && b[2] > 200;
+          }
+        },
+        {
+          id: 'art-3',
+          name: 'Moving Circle',
+          desc: 'Animate with frameCount',
+          mission: 'Make a circle move horizontally using frameCount. Set x = frameCount % 500 to make it loop.',
+          hint: '<code>frameCount</code> increases every frame. Use modulo (%) to loop it.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  fill(0, 255, 136);
+  
+  // Make x change over time using frameCount
+  let x = 250; // Change this to use frameCount
+  let y = 200;
+  
+  circle(x, y, 50);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-4',
+          name: 'Sine Wave Motion',
+          desc: 'Smooth oscillation',
+          mission: 'Make a circle move up and down smoothly using sin(). y = 200 + sin(frameCount * 0.05) * 100',
+          hint: '<code>sin()</code> returns values between -1 and 1. Multiply to scale the movement.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  fill(68, 136, 255);
+  
+  let x = 250;
+  // Make y oscillate using sin()
+  let y = 200;
+  
+  circle(x, y, 50);
+}`,
+          check: (p) => p.frameCount > 50
+        },
+        {
+          id: 'art-5',
+          name: 'Trail Effect',
+          desc: 'Fading motion trails',
+          mission: 'Create a trail effect by using semi-transparent background: background(10, 10, 18, 20) - the 20 is alpha!',
+          hint: 'A low alpha value (like 20) makes the background semi-transparent, creating trails.',
+          starterCode: `function draw() {
+  // Change this to have alpha (4th parameter)
+  background(10, 10, 18);
+  
+  fill(0, 255, 136);
+  let x = 250 + sin(frameCount * 0.05) * 150;
+  let y = 200 + cos(frameCount * 0.03) * 100;
+  circle(x, y, 30);
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'art-6',
+          name: 'Loop Art',
+          desc: 'Draw with for loops',
+          mission: 'Use a for loop to draw 10 circles in a row. for(let i=0; i<10; i++) { circle(50 + i*45, 200, 30); }',
+          hint: 'Loops let you repeat drawing commands with different positions.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  fill(0, 255, 136);
+  noStroke();
+  
+  // Use a for loop to draw 10 circles
+  // Each circle should be at x = 50 + i*45
+  
+}`,
+          check: (p) => {
+            let count = 0;
+            for (let i = 0; i < 10; i++) {
+              const px = p.get(50 + i * 45, 200);
+              if (px[1] > 100) count++;
+            }
+            return count >= 8;
+          }
+        },
+        {
+          id: 'art-7',
+          name: 'Random Colors',
+          desc: 'Add randomness',
+          mission: 'Use random() for colors! fill(random(255), random(255), random(255)) gives random RGB.',
+          hint: '<code>random(255)</code> gives a random number from 0 to 255.',
+          starterCode: `function draw() {
+  background(10, 10, 18, 30);
+  noStroke();
+  
+  // Use random() for position and color
+  let x = random(width);
+  let y = random(height);
+  
+  // Add random color here
+  fill(100, 100, 100);
+  
+  circle(x, y, 20);
+}`,
+          check: (p) => p.frameCount > 40
+        },
+        {
+          id: 'art-8',
+          name: 'Spiral Pattern',
+          desc: 'Combine everything!',
+          mission: 'Create a spiral! In a loop: x = 250 + cos(angle) * radius, y = 200 + sin(angle) * radius. Increase angle and radius.',
+          hint: 'A spiral forms when you increase both the angle and the distance from center.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  noStroke();
+  
+  // Draw a spiral of dots
+  for (let i = 0; i < 200; i++) {
+    let angle = i * 0.1;
+    let radius = i * 0.8;
+    
+    // Calculate x and y using cos and sin
+    let x = 250; // + cos(angle) * radius
+    let y = 200; // + sin(angle) * radius
+    
+    fill(i, 255 - i, 150);
+    circle(x, y, 5);
+  }
+}`,
+          check: (p) => {
+            const center = p.get(250, 200);
+            const edge = p.get(350, 200);
+            return center[0] !== edge[0] || center[1] !== edge[1];
+          }
+        },
+        {
+          id: 'art-9',
+          name: 'Mouse Interaction',
+          desc: 'Draw where you click',
+          mission: 'Draw circles at mouse position! Use mouseX and mouseY to get cursor location.',
+          hint: '<code>mouseX</code> and <code>mouseY</code> give you the cursor position.',
+          starterCode: `function draw() {
+  background(10, 10, 18, 20);
+  fill(0, 255, 136);
+  noStroke();
+  
+  // Draw a circle at the mouse position
+  // Use mouseX and mouseY
+  circle(225, 160, 30);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-10',
+          name: 'Nested Loops',
+          desc: 'Create a grid',
+          mission: 'Use two nested for loops to create a 10x8 grid of circles!',
+          hint: 'Outer loop for rows (y), inner loop for columns (x).',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  noStroke();
+  
+  // Create a grid using nested loops
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 10; col++) {
+      // Calculate x and y from row and col
+      let x = 25 + col * 45;
+      let y = 25 + row * 40;
+      
+      // Add some color variation based on position
+      fill(col * 25, row * 30, 150);
+      circle(x, y, 15);
+    }
+  }
+}`,
+          check: (p) => {
+            const corners = [p.get(25, 25), p.get(430, 305)];
+            return corners[0][0] > 0 || corners[1][0] > 0;
+          }
+        },
+        {
+          id: 'art-11',
+          name: 'Particle System',
+          desc: 'Spawn particles',
+          mission: 'Create a particle array. Each frame, add a new particle and update all positions.',
+          hint: 'Push new objects to array, loop through to update and draw.',
+          starterCode: `let particles = [];
+
+function draw() {
+  background(10, 10, 18, 30);
+  noStroke();
+  
+  // Add a new particle at mouse position
+  if (frameCount % 3 === 0) {
+    particles.push({
+      x: mouseX || 225,
+      y: mouseY || 160,
+      vx: random(-2, 2),
+      vy: random(-3, -1),
+      life: 255
+    });
+  }
+  
+  // Update and draw each particle
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 5;
+    
+    fill(0, 255, 136, p.life);
+    circle(p.x, p.y, 10);
+    
+    // Remove dead particles
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}`,
+          check: (p) => p.frameCount > 50
+        },
+        {
+          id: 'art-12',
+          name: 'Gradient Lines',
+          desc: 'Draw color gradients',
+          mission: 'Use lerpColor() to blend between two colors! Draw lines with smooth color transition.',
+          hint: '<code>lerpColor(c1, c2, amount)</code> blends colors. Amount is 0-1.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  
+  let c1 = color(255, 0, 100);  // Pink
+  let c2 = color(0, 200, 255);  // Cyan
+  
+  // Draw vertical lines with gradient
+  for (let x = 0; x < width; x += 3) {
+    // Calculate blend amount (0 to 1)
+    let amount = x / width;
+    
+    // Use lerpColor to get the blended color
+    let c = lerpColor(c1, c2, amount);
+    
+    stroke(c);
+    strokeWeight(3);
+    line(x, 50, x, 270);
+  }
+}`,
+          check: (p) => p.frameCount > 5
+        },
+        {
+          id: 'art-13',
+          name: 'Fractal Tree',
+          desc: 'Recursive drawing',
+          mission: 'Create a recursive tree! A function that calls itself with smaller branches.',
+          hint: 'Use push()/pop() to save/restore transformations.',
+          starterCode: `function setup() {
+  background(10, 10, 18);
+  stroke(0, 255, 136);
+  strokeWeight(2);
+  
+  // Start the tree from bottom center
+  translate(225, 320);
+  branch(80);
+}
+
+function branch(len) {
+  // Draw the branch
+  line(0, 0, 0, -len);
+  translate(0, -len);
+  
+  // Stop if too small
+  if (len > 8) {
+    // Right branch
+    push();
+    rotate(PI / 6);
+    branch(len * 0.7);
+    pop();
+    
+    // Left branch
+    push();
+    rotate(-PI / 6);
+    branch(len * 0.7);
+    pop();
+  }
+}
+
+function draw() {
+  // Tree is drawn in setup, no animation needed
+}`,
+          check: (p) => p.frameCount > 5
+        },
+        {
+          id: 'art-14',
+          name: 'Creative Project',
+          desc: 'Make your own art!',
+          mission: 'Combine everything you learned! Create something unique with loops, colors, animation, and interaction.',
+          hint: 'Be creative! Mix sin/cos, random, mouse, particles - whatever inspires you.',
+          starterCode: `// 🎨 YOUR CREATIVE MASTERPIECE!
+// Combine: loops, sin/cos, random, mouseX/Y, particles
+
+function draw() {
+  background(10, 10, 18, 20);
+  
+  // Your creative code here!
+  // Try making:
+  // - A flowing wave pattern
+  // - An interactive particle explosion
+  // - A kaleidoscope effect
+  // - A geometric mandala
+  
+  for (let i = 0; i < 50; i++) {
+    let angle = i * 0.2 + frameCount * 0.02;
+    let r = 50 + sin(frameCount * 0.05 + i * 0.1) * 30;
+    let x = 225 + cos(angle) * r;
+    let y = 160 + sin(angle) * r;
+    
+    fill(i * 5, 150, 255 - i * 5, 150);
+    noStroke();
+    circle(x, y, 10);
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-15',
+          name: 'Kaleidoscope',
+          desc: 'Mirror symmetry art',
+          mission: 'Create 8-fold symmetry! Draw once, rotate and repeat 8 times.',
+          hint: 'Use push()/pop(), translate to center, rotate by PI/4 each time.',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  translate(225, 160);
+  
+  let segments = 8;
+  let angle = TWO_PI / segments;
+  
+  for (let i = 0; i < segments; i++) {
+    push();
+    rotate(angle * i);
+    
+    // Draw your pattern here
+    let x = 50 + sin(frameCount * 0.05) * 30;
+    let y = 20;
+    
+    stroke(map(i, 0, segments, 0, 255), 200, 255);
+    strokeWeight(3);
+    noFill();
+    line(0, 0, x, y);
+    circle(x, y, 20);
+    
+    pop();
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-16',
+          name: '3D Starfield',
+          desc: 'Fake 3D effect',
+          mission: 'Create stars that fly toward you! Use z-coordinate and map() for perspective.',
+          hint: 'Stars closer (low z) are bigger and faster. Map z to size.',
+          starterCode: `let stars = [];
+
+function setup() {
+  for (let i = 0; i < 200; i++) {
+    stars.push({
+      x: random(-250, 250),
+      y: random(-200, 200),
+      z: random(400)
+    });
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  translate(225, 160);
+  
+  for (let star of stars) {
+    // Move star toward viewer
+    star.z -= 5;
+    
+    // Reset if too close
+    if (star.z < 1) {
+      star.z = 400;
+      star.x = random(-250, 250);
+      star.y = random(-200, 200);
+    }
+    
+    // Project 3D to 2D
+    let sx = map(star.x / star.z, 0, 1, 0, 225);
+    let sy = map(star.y / star.z, 0, 1, 0, 160);
+    let size = map(star.z, 0, 400, 6, 0);
+    
+    fill(255);
+    noStroke();
+    circle(sx, sy, size);
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-17',
+          name: 'Noise Landscape',
+          desc: 'Perlin noise terrain',
+          mission: 'Use noise() for smooth randomness! Create a flowing mountain landscape.',
+          hint: '<code>noise(x, y)</code> returns smooth value 0-1. Change input slowly for smooth result.',
+          starterCode: `let offset = 0;
+
+function draw() {
+  background(10, 10, 18);
+  
+  noFill();
+  
+  // Draw multiple layers
+  for (let layer = 0; layer < 5; layer++) {
+    stroke(0, 150 + layer * 20, 100 + layer * 30);
+    strokeWeight(2);
+    
+    beginShape();
+    for (let x = 0; x <= width; x += 5) {
+      // Use noise for y position
+      let noiseVal = noise(x * 0.01 + layer * 10, offset + layer);
+      let y = map(noiseVal, 0, 1, 100 + layer * 30, 250 + layer * 30);
+      vertex(x, y);
+    }
+    endShape();
+  }
+  
+  offset += 0.01;
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-18',
+          name: 'Polar Roses',
+          desc: 'Mathematical flowers',
+          mission: 'Rose curves! r = cos(k * theta). Different k values make different petals.',
+          hint: 'k=3 makes 3 petals, k=4 makes 8 petals. Try different values!',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  translate(225, 160);
+  
+  let k = 5;  // Number of petals
+  let scale = 100;
+  
+  stroke(255, 100, 150);
+  strokeWeight(2);
+  noFill();
+  
+  beginShape();
+  for (let theta = 0; theta < TWO_PI * 2; theta += 0.02) {
+    // Rose curve equation
+    let r = cos(k * theta + frameCount * 0.02) * scale;
+    let x = r * cos(theta);
+    let y = r * sin(theta);
+    vertex(x, y);
+  }
+  endShape(CLOSE);
+  
+  // Draw another rose with different k
+  stroke(100, 200, 255, 150);
+  beginShape();
+  for (let theta = 0; theta < TWO_PI * 2; theta += 0.02) {
+    let r = cos(3 * theta - frameCount * 0.03) * scale * 0.7;
+    let x = r * cos(theta);
+    let y = r * sin(theta);
+    vertex(x, y);
+  }
+  endShape(CLOSE);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-19',
+          name: 'Text Art',
+          desc: 'Animated typography',
+          mission: 'Use text() to draw letters. Animate size, position, or color!',
+          hint: '<code>text("Hello", x, y)</code> draws text. Use textSize() and textAlign().',
+          starterCode: `function draw() {
+  background(10, 10, 18);
+  
+  textAlign(CENTER, CENTER);
+  
+  let message = "CREATIVE";
+  
+  for (let i = 0; i < message.length; i++) {
+    let char = message[i];
+    let angle = frameCount * 0.02 + i * 0.5;
+    
+    // Wave motion for each letter
+    let x = 50 + i * 45;
+    let y = 160 + sin(angle) * 30;
+    let size = 30 + sin(frameCount * 0.05 + i) * 10;
+    
+    // Rainbow colors
+    colorMode(HSB, 360, 100, 100);
+    fill((i * 40 + frameCount) % 360, 80, 100);
+    
+    textSize(size);
+    text(char, x, y);
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'art-20',
+          name: 'Pixel Art Grid',
+          desc: 'Retro pixel style',
+          mission: 'Create pixel art with a grid! Use 2D array to store colors.',
+          hint: 'rect() with noStroke() for clean pixels. Use array[row][col] for data.',
+          starterCode: `let grid = [];
+let cols = 16;
+let rows = 12;
+let cellSize;
+
+function setup() {
+  cellSize = min(width/cols, height/rows);
+  
+  // Create grid with random colors
+  for (let r = 0; r < rows; r++) {
+    grid[r] = [];
+    for (let c = 0; c < cols; c++) {
+      grid[r][c] = color(
+        random(100, 255),
+        random(50, 200),
+        random(100, 255)
+      );
+    }
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Offset to center the grid
+  let offsetX = (width - cols * cellSize) / 2;
+  let offsetY = (height - rows * cellSize) / 2;
+  
+  noStroke();
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      fill(grid[r][c]);
+      rect(offsetX + c * cellSize, offsetY + r * cellSize, 
+           cellSize - 2, cellSize - 2, 2);
+    }
+  }
+}
+
+function mousePressed() {
+  // Click to change colors
+  let c = floor((mouseX - 40) / cellSize);
+  let r = floor((mouseY - 30) / cellSize);
+  if (r >= 0 && r < rows && c >= 0 && c < cols) {
+    grid[r][c] = color(random(255), random(255), random(255));
+  }
+}`,
+          check: (p) => p.frameCount > 10
+        },
+        {
+          id: 'art-21',
+          name: 'Optical Illusion',
+          desc: 'Moving static patterns',
+          mission: 'Create patterns that seem to move! Moiré effects from overlapping shapes.',
+          hint: 'Overlapping circles with slight offsets create motion illusion.',
+          starterCode: `function draw() {
+  background(255);
+  
+  noFill();
+  strokeWeight(2);
+  
+  // First set of circles
+  stroke(0);
+  for (let r = 10; r < 300; r += 10) {
+    circle(225, 160, r);
+  }
+  
+  // Second set offset by mouse
+  let ox = (mouseX - 225) * 0.1;
+  let oy = (mouseY - 160) * 0.1;
+  
+  for (let r = 10; r < 300; r += 10) {
+    circle(225 + ox, 160 + oy, r);
+  }
+}`,
+          check: (p) => p.frameCount > 20
+        },
+        {
+          id: 'art-22',
+          name: 'Data Visualization',
+          desc: 'Make charts come alive',
+          mission: 'Create an animated bar chart! Use data arrays and map() for scaling.',
+          hint: 'Random data + lerp() for smooth transitions between values.',
+          starterCode: `let data = [30, 70, 45, 90, 60, 80, 40];
+let targetData = [];
+let labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+function setup() {
+  targetData = [...data];
+  setInterval(() => {
+    for (let i = 0; i < data.length; i++) {
+      targetData[i] = random(20, 100);
+    }
+  }, 2000);
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  let barWidth = 50;
+  let gap = 15;
+  let startX = 40;
+  
+  for (let i = 0; i < data.length; i++) {
+    // Smooth animation
+    data[i] = lerp(data[i], targetData[i], 0.05);
+    
+    let barHeight = map(data[i], 0, 100, 0, 200);
+    let x = startX + i * (barWidth + gap);
+    let y = 280 - barHeight;
+    
+    // Color based on value
+    colorMode(HSB, 100);
+    fill(data[i], 80, 90);
+    noStroke();
+    rect(x, y, barWidth, barHeight, 5);
+    
+    // Label
+    fill(200);
+    textAlign(CENTER);
+    textSize(12);
+    text(labels[i], x + barWidth/2, 300);
+    text(floor(data[i]), x + barWidth/2, y - 10);
+  }
+  
+  // Title
+  fill(255);
+  textSize(18);
+  text('Weekly Stats', 225, 30);
+}`,
+          check: (p) => p.frameCount > 30
+        }
+      ],
+      music: [
+        {
+          id: 'music-1',
+          name: 'First Note',
+          desc: 'Play a single tone',
+          mission: 'Return a note with freq: 440 (A note), duration: 500, delay: 0',
+          hint: 'Return an array with one note object: <code>[{freq: 440, duration: 500, delay: 0}]</code>',
+          starterCode: `function onRun() {
+  // Return an array with one note
+  // freq: 440 = A note
+  // duration: how long in ms
+  // delay: when to start
+  
+  return [];
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-2',
+          name: 'Two Notes',
+          desc: 'Play a sequence',
+          mission: 'Play two notes: first at 440Hz, second at 523Hz (C note) with delay 500ms',
+          hint: 'Add a second object to the array with delay: 500',
+          starterCode: `function onRun() {
+  return [
+    { freq: 440, duration: 400, delay: 0 },
+    // Add second note here
+  ];
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-3',
+          name: 'Scale Up',
+          desc: 'Play a musical scale',
+          mission: 'Use a loop to play C major scale: [261, 294, 329, 349, 392, 440, 494, 523]',
+          hint: 'Use a for loop and set delay to i * 250 for each note',
+          starterCode: `function onRun() {
+  const scale = [261, 294, 329, 349, 392, 440, 494, 523];
+  const notes = [];
+  
+  // Use a loop to add each note
+  // Set delay = i * 250
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-4',
+          name: 'Random Melody',
+          desc: 'Algorithmic composition',
+          mission: 'Pick random notes from the scale using Math.floor(Math.random() * scale.length)',
+          hint: 'Random index = Math.floor(Math.random() * array.length)',
+          starterCode: `function onRun() {
+  const scale = [261, 294, 329, 349, 392, 440, 494, 523];
+  const notes = [];
+  
+  for (let i = 0; i < 8; i++) {
+    // Pick a random note from scale
+    const randomIndex = 0; // Make this random!
+    
+    notes.push({
+      freq: scale[randomIndex],
+      duration: 200,
+      delay: i * 250
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-5',
+          name: 'Harmony',
+          desc: 'Play multiple notes together',
+          mission: 'Play two notes at the same time! Give them the same delay but different frequencies.',
+          hint: 'Same delay = notes play together. Try frequencies 261 and 329 (C and E).',
+          starterCode: `function onRun() {
+  // Play a chord - two notes at once!
+  return [
+    { freq: 261, duration: 800, delay: 0 },
+    // Add another note with same delay
+    
+  ];
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-6',
+          name: 'Rhythm Pattern',
+          desc: 'Create a beat',
+          mission: 'Make a rhythm! Use different delays: 0, 200, 400, 500, 700, 1000 for syncopation.',
+          hint: 'Uneven spacing creates interesting rhythms.',
+          starterCode: `function onRun() {
+  const beat = [0, 200, 400, 500, 700, 1000];
+  const notes = [];
+  
+  // Create a rhythmic pattern
+  for (let i = 0; i < beat.length; i++) {
+    notes.push({
+      freq: 200,  // Low tone for percussive feel
+      duration: 80,
+      delay: beat[i]
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-7',
+          name: 'Chord Progression',
+          desc: 'I-V-vi-IV progression',
+          mission: 'The famous pop progression! Play C, G, Am, F chords in sequence.',
+          hint: 'Each chord is 3 notes. C=[261,329,392], G=[196,247,294], etc.',
+          starterCode: `function onRun() {
+  const chords = [
+    [261, 329, 392],  // C major
+    [196, 247, 294],  // G major  
+    [220, 261, 329],  // A minor
+    [175, 220, 261]   // F major
+  ];
+  
+  const notes = [];
+  let time = 0;
+  
+  for (let chord of chords) {
+    // Add all notes of the chord at the same time
+    for (let freq of chord) {
+      notes.push({
+        freq: freq,
+        duration: 600,
+        delay: time
+      });
+    }
+    time += 700;  // Move to next chord
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-8',
+          name: 'Arpeggio',
+          desc: 'Broken chord pattern',
+          mission: 'Play chord notes one by one instead of together. Create a flowing arpeggio!',
+          hint: 'Same frequencies as chord, but with increasing delays.',
+          starterCode: `function onRun() {
+  const chord = [261, 329, 392, 523];  // C major with octave
+  const notes = [];
+  
+  // Play each note 100ms apart
+  for (let i = 0; i < chord.length; i++) {
+    notes.push({
+      freq: chord[i],
+      duration: 300,
+      delay: i * 100
+    });
+  }
+  
+  // Play backwards too!
+  for (let i = chord.length - 2; i >= 0; i--) {
+    notes.push({
+      freq: chord[i],
+      duration: 300,
+      delay: 400 + (chord.length - 1 - i) * 100
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-9',
+          name: 'Drum Beat',
+          desc: 'Low frequency percussion',
+          mission: 'Create kick and snare! Use 80Hz for kick (low), 200Hz for snare (higher).',
+          hint: 'Kick on beats 1 and 3, snare on 2 and 4.',
+          starterCode: `function onRun() {
+  const notes = [];
+  const beatLength = 250;  // Quarter note
+  
+  for (let bar = 0; bar < 2; bar++) {
+    const offset = bar * 1000;
+    
+    // Kick on beats 1 and 3
+    notes.push({ freq: 80, duration: 100, delay: offset + 0 });
+    notes.push({ freq: 80, duration: 100, delay: offset + 500 });
+    
+    // Snare on beats 2 and 4
+    notes.push({ freq: 200, duration: 80, delay: offset + 250 });
+    notes.push({ freq: 200, duration: 80, delay: offset + 750 });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-10',
+          name: 'Algorithmic Song',
+          desc: 'Your own composition!',
+          mission: 'Combine everything: melody, harmony, rhythm. Create a mini song!',
+          hint: 'Layer drums, bass, and melody. Use loops and math!',
+          starterCode: `function onRun() {
+  const scale = [261, 294, 329, 349, 392, 440, 494, 523];
+  const notes = [];
+  
+  // Bass line
+  for (let i = 0; i < 8; i++) {
+    notes.push({
+      freq: 130,  // Low C
+      duration: 200,
+      delay: i * 250
+    });
+  }
+  
+  // Melody using scale
+  for (let i = 0; i < 8; i++) {
+    let freq = scale[Math.floor(Math.random() * scale.length)];
+    notes.push({
+      freq: freq,
+      duration: 150,
+      delay: i * 250 + 50
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-11',
+          name: 'Pentatonic Scale',
+          desc: 'The pleasing 5-note scale',
+          mission: 'Pentatonic scales sound great! Use [261, 294, 329, 392, 440] - you cant go wrong!',
+          hint: 'Skip some notes from the major scale for a more musical sound.',
+          starterCode: `function onRun() {
+  // Pentatonic scale - always sounds good!
+  const pentatonic = [261, 294, 329, 392, 440, 523];
+  const notes = [];
+  
+  // Play the scale up
+  for (let i = 0; i < pentatonic.length; i++) {
+    notes.push({
+      freq: pentatonic[i],
+      duration: 300,
+      delay: i * 200
+    });
+  }
+  
+  // Play it down
+  for (let i = pentatonic.length - 2; i >= 0; i--) {
+    notes.push({
+      freq: pentatonic[i],
+      duration: 300,
+      delay: (pentatonic.length + (pentatonic.length - 2 - i)) * 200
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-12',
+          name: 'Echo Effect',
+          desc: 'Delayed repeats',
+          mission: 'Create echo! Play same note multiple times with decreasing volume (shorter duration).',
+          hint: 'Each repeat: increase delay, decrease duration.',
+          starterCode: `function onRun() {
+  const notes = [];
+  const baseFreq = 392;  // G note
+  const echoCount = 5;
+  
+  for (let i = 0; i < echoCount; i++) {
+    notes.push({
+      freq: baseFreq,
+      duration: 400 - i * 60,  // Gets shorter
+      delay: i * 150  // Spaced out
+    });
+  }
+  
+  // Add another echoed note
+  for (let i = 0; i < echoCount; i++) {
+    notes.push({
+      freq: 523,  // C note
+      duration: 400 - i * 60,
+      delay: 800 + i * 150
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-13',
+          name: 'Frequency Sweep',
+          desc: 'Gliding tones',
+          mission: 'Create a rising sweep! Gradually increase frequency from low to high.',
+          hint: 'Many short notes with slightly increasing frequency.',
+          starterCode: `function onRun() {
+  const notes = [];
+  const steps = 20;
+  
+  for (let i = 0; i < steps; i++) {
+    // Sweep from 200Hz to 800Hz
+    let freq = 200 + (600 * i / steps);
+    
+    notes.push({
+      freq: Math.round(freq),
+      duration: 80,
+      delay: i * 50
+    });
+  }
+  
+  // Sweep back down
+  for (let i = 0; i < steps; i++) {
+    let freq = 800 - (600 * i / steps);
+    
+    notes.push({
+      freq: Math.round(freq),
+      duration: 80,
+      delay: 1000 + i * 50
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-14',
+          name: 'Polyrhythm',
+          desc: 'Competing rhythms',
+          mission: 'Layer rhythms! Play 3 beats against 4 beats for interesting patterns.',
+          hint: '3 vs 4 polyrhythm: one voice plays every 333ms, other every 250ms.',
+          starterCode: `function onRun() {
+  const notes = [];
+  const duration = 2000;  // 2 seconds
+  
+  // Voice 1: 4 beats per cycle
+  for (let t = 0; t < duration; t += 250) {
+    notes.push({
+      freq: 440,  // High voice
+      duration: 100,
+      delay: t
+    });
+  }
+  
+  // Voice 2: 3 beats per cycle (333ms)
+  for (let t = 0; t < duration; t += 333) {
+    notes.push({
+      freq: 220,  // Low voice
+      duration: 100,
+      delay: t
+    });
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        },
+        {
+          id: 'music-15',
+          name: 'Build-a-Beat',
+          desc: 'Complete drum pattern',
+          mission: 'Create a full beat: kick, snare, hi-hat. Layer them like a drum machine!',
+          hint: 'Kick: 80Hz, Snare: 200Hz, Hi-hat: 800Hz with short duration.',
+          starterCode: `function onRun() {
+  const notes = [];
+  const bars = 2;
+  const beatLen = 250;
+  
+  for (let bar = 0; bar < bars; bar++) {
+    const offset = bar * 1000;
+    
+    // Kick: beats 1 and 3
+    notes.push({ freq: 80, duration: 100, delay: offset + 0 });
+    notes.push({ freq: 80, duration: 100, delay: offset + 500 });
+    
+    // Snare: beats 2 and 4
+    notes.push({ freq: 200, duration: 60, delay: offset + 250 });
+    notes.push({ freq: 200, duration: 60, delay: offset + 750 });
+    
+    // Hi-hat: every 8th note
+    for (let i = 0; i < 8; i++) {
+      notes.push({ 
+        freq: 800, 
+        duration: 30, 
+        delay: offset + i * 125 
+      });
+    }
+  }
+  
+  return notes;
+}`,
+          check: () => true
+        }
+      ],
+      animation: [
+        {
+          id: 'anim-1',
+          name: 'Moving Ball',
+          desc: 'Basic movement',
+          mission: 'Create a ball that moves. Add ball.x += 2 in draw() to move it right.',
+          hint: 'Update the x position each frame: <code>ball.x += 2</code>',
+          starterCode: `let ball = { x: 50, y: 200 };
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Move ball to the right
+  // YOUR CODE HERE
+  
+  fill(0, 255, 136);
+  circle(ball.x, ball.y, 40);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-2',
+          name: 'Bouncing Ball',
+          desc: 'Wall collision',
+          mission: 'Make ball bounce! If ball.x > width, multiply velocity by -1',
+          hint: 'Check boundaries: <code>if (ball.x > width || ball.x < 0) ball.vx *= -1</code>',
+          starterCode: `let ball = { x: 250, y: 200, vx: 3 };
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Update position
+  ball.x += ball.vx;
+  
+  // Add bounce logic here
+  // if ball hits edge, reverse vx
+  
+  fill(0, 255, 136);
+  circle(ball.x, ball.y, 40);
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'anim-3',
+          name: 'Gravity',
+          desc: 'Add physics',
+          mission: 'Add gravity! Each frame: ball.vy += 0.5 (accelerate down), ball.y += ball.vy (apply velocity)',
+          hint: 'Gravity is constant acceleration: <code>ball.vy += 0.5</code> each frame',
+          starterCode: `let ball = { x: 250, y: 50, vy: 0 };
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Add gravity (increase vy)
+  // Update y position
+  // Bounce off bottom
+  
+  fill(68, 136, 255);
+  circle(ball.x, ball.y, 40);
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'anim-4',
+          name: 'Multiple Balls',
+          desc: 'Arrays of objects',
+          mission: 'Create an array of balls in setup(). Loop through them in draw() to update and render.',
+          hint: 'Use a for loop: <code>for (let ball of balls) { ... }</code>',
+          starterCode: `let balls = [];
+
+function setup() {
+  // Create 5 balls with random positions
+  for (let i = 0; i < 5; i++) {
+    balls.push({
+      x: random(width),
+      y: random(height),
+      vx: random(-3, 3),
+      vy: random(-3, 3)
+    });
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Loop through all balls
+  // Update position and draw each one
+  
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-5',
+          name: 'Collision Detection',
+          desc: 'Ball-to-ball collision',
+          mission: 'Detect when two balls touch! Use dist(x1,y1,x2,y2) to measure distance between centers.',
+          hint: '<code>dist(a.x, a.y, b.x, b.y) < a.r + b.r</code> means collision!',
+          starterCode: `let ball1 = { x: 100, y: 160, vx: 2, r: 25 };
+let ball2 = { x: 350, y: 160, vx: -2, r: 25 };
+let colliding = false;
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Update positions
+  ball1.x += ball1.vx;
+  ball2.x += ball2.vx;
+  
+  // Check collision using dist()
+  let d = dist(ball1.x, ball1.y, ball2.x, ball2.y);
+  colliding = d < ball1.r + ball2.r;
+  
+  // Change color on collision
+  if (colliding) {
+    fill(255, 100, 100);
+  } else {
+    fill(0, 255, 136);
+  }
+  
+  circle(ball1.x, ball1.y, ball1.r * 2);
+  circle(ball2.x, ball2.y, ball2.r * 2);
+  
+  // Bounce off walls
+  if (ball1.x < 0 || ball1.x > width) ball1.vx *= -1;
+  if (ball2.x < 0 || ball2.x > width) ball2.vx *= -1;
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'anim-6',
+          name: 'Mouse Follower',
+          desc: 'Smooth following',
+          mission: 'Make a ball follow the mouse smoothly using lerp() for easing.',
+          hint: '<code>x = lerp(x, mouseX, 0.05)</code> moves x 5% closer to mouseX each frame.',
+          starterCode: `let follower = { x: 225, y: 160 };
+
+function draw() {
+  background(10, 10, 18, 30);
+  
+  // Move follower toward mouse smoothly
+  // Use lerp(current, target, speed)
+  follower.x = lerp(follower.x, mouseX || 225, 0.05);
+  follower.y = lerp(follower.y, mouseY || 160, 0.05);
+  
+  fill(0, 255, 136);
+  noStroke();
+  circle(follower.x, follower.y, 40);
+  
+  // Draw target crosshair at mouse
+  stroke(255, 100);
+  line(mouseX - 10, mouseY, mouseX + 10, mouseY);
+  line(mouseX, mouseY - 10, mouseX, mouseY + 10);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-7',
+          name: 'Spring Physics',
+          desc: 'Elastic motion',
+          mission: 'Create a spring! The force pulls toward anchor point, stronger when stretched more.',
+          hint: 'Spring force = -k * displacement. Add damping to prevent infinite oscillation.',
+          starterCode: `let anchor = { x: 225, y: 100 };
+let ball = { x: 225, y: 250, vx: 0, vy: 0 };
+let k = 0.02;  // Spring stiffness
+let damping = 0.98;
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Calculate spring force
+  let fx = (anchor.x - ball.x) * k;
+  let fy = (anchor.y - ball.y) * k;
+  
+  // Apply force to velocity
+  ball.vx += fx;
+  ball.vy += fy;
+  
+  // Apply damping (friction)
+  ball.vx *= damping;
+  ball.vy *= damping;
+  
+  // Update position
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  
+  // Draw spring line
+  stroke(100);
+  strokeWeight(2);
+  line(anchor.x, anchor.y, ball.x, ball.y);
+  
+  // Draw anchor
+  fill(100);
+  noStroke();
+  circle(anchor.x, anchor.y, 15);
+  
+  // Draw ball
+  fill(0, 255, 136);
+  circle(ball.x, ball.y, 40);
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'anim-8',
+          name: 'Friction & Air',
+          desc: 'Realistic deceleration',
+          mission: 'Add friction! Multiply velocity by 0.99 each frame to slow down naturally.',
+          hint: 'Friction: <code>vx *= 0.99</code>. Lower = more friction.',
+          starterCode: `let ball = { x: 50, y: 160, vx: 8, vy: 0 };
+const friction = 0.99;
+const gravity = 0.3;
+const bounce = 0.8;
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Apply gravity
+  ball.vy += gravity;
+  
+  // Apply friction
+  ball.vx *= friction;
+  ball.vy *= friction;
+  
+  // Update position
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  
+  // Bounce off floor
+  if (ball.y > height - 20) {
+    ball.y = height - 20;
+    ball.vy *= -bounce;
+  }
+  
+  // Bounce off walls
+  if (ball.x < 20 || ball.x > width - 20) {
+    ball.vx *= -bounce;
+  }
+  
+  fill(68, 136, 255);
+  noStroke();
+  circle(ball.x, ball.y, 40);
+}`,
+          check: (p) => p.frameCount > 60
+        },
+        {
+          id: 'anim-9',
+          name: 'Rainbow Trail',
+          desc: 'Color cycling',
+          mission: 'Use colorMode(HSB) and increment hue over time for rainbow colors!',
+          hint: '<code>colorMode(HSB, 360, 100, 100)</code> then <code>fill(hue, 100, 100)</code>',
+          starterCode: `let points = [];
+
+function draw() {
+  colorMode(HSB, 360, 100, 100);
+  background(240, 20, 8);
+  
+  // Add current mouse position
+  points.push({ 
+    x: mouseX || 225, 
+    y: mouseY || 160,
+    hue: frameCount % 360
+  });
+  
+  // Keep only last 50 points
+  if (points.length > 50) points.shift();
+  
+  // Draw trail
+  noStroke();
+  for (let i = 0; i < points.length; i++) {
+    let p = points[i];
+    let size = map(i, 0, points.length, 5, 30);
+    fill(p.hue, 80, 100, 0.8);
+    circle(p.x, p.y, size);
+  }
+}`,
+          check: (p) => p.frameCount > 40
+        },
+        {
+          id: 'anim-10',
+          name: 'Physics Playground',
+          desc: 'Your own simulation!',
+          mission: 'Combine everything: gravity, bouncing, friction, multiple objects. Create a physics toy!',
+          hint: 'Be creative! Add click to spawn, drag objects, or create a game.',
+          starterCode: `let balls = [];
+
+function setup() {
+  // Create initial balls
+  for (let i = 0; i < 10; i++) {
+    balls.push({
+      x: random(50, 400),
+      y: random(50, 200),
+      vx: random(-2, 2),
+      vy: 0,
+      r: random(10, 25),
+      hue: random(360)
+    });
+  }
+}
+
+function draw() {
+  colorMode(HSB, 360, 100, 100);
+  background(240, 30, 8);
+  
+  for (let ball of balls) {
+    // Gravity
+    ball.vy += 0.2;
+    
+    // Friction
+    ball.vx *= 0.995;
+    
+    // Move
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+    
+    // Bounce
+    if (ball.y > height - ball.r) {
+      ball.y = height - ball.r;
+      ball.vy *= -0.8;
+    }
+    if (ball.x < ball.r || ball.x > width - ball.r) {
+      ball.vx *= -0.9;
+    }
+    
+    // Draw
+    fill(ball.hue, 80, 100);
+    noStroke();
+    circle(ball.x, ball.y, ball.r * 2);
+  }
+}
+
+function mousePressed() {
+  // Click to add new ball
+  balls.push({
+    x: mouseX,
+    y: mouseY,
+    vx: random(-5, 5),
+    vy: random(-10, -5),
+    r: random(10, 25),
+    hue: random(360)
+  });
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-11',
+          name: 'Paddle Game',
+          desc: 'Pong mechanics',
+          mission: 'Create a paddle! Move it with arrow keys and bounce a ball off it.',
+          hint: 'keyIsDown(LEFT_ARROW) and keyIsDown(RIGHT_ARROW) for input.',
+          starterCode: `let paddle = { x: 200, y: 290, w: 80, h: 12 };
+let ball = { x: 225, y: 160, vx: 3, vy: 3 };
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Move paddle with arrow keys
+  if (keyIsDown(LEFT_ARROW)) paddle.x -= 6;
+  if (keyIsDown(RIGHT_ARROW)) paddle.x += 6;
+  
+  // Keep paddle in bounds
+  paddle.x = constrain(paddle.x, 0, width - paddle.w);
+  
+  // Move ball
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  
+  // Wall bounce
+  if (ball.x < 10 || ball.x > width - 10) ball.vx *= -1;
+  if (ball.y < 10) ball.vy *= -1;
+  
+  // Paddle collision
+  if (ball.y > paddle.y - 10 && 
+      ball.x > paddle.x && 
+      ball.x < paddle.x + paddle.w) {
+    ball.vy = -abs(ball.vy);
+  }
+  
+  // Reset if missed
+  if (ball.y > height) {
+    ball.y = 100;
+    ball.vy = 3;
+  }
+  
+  // Draw paddle
+  fill(0, 255, 136);
+  noStroke();
+  rect(paddle.x, paddle.y, paddle.w, paddle.h, 6);
+  
+  // Draw ball
+  fill(255, 200, 50);
+  circle(ball.x, ball.y, 16);
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-12',
+          name: 'Snake Game',
+          desc: 'Classic snake movement',
+          mission: 'Move a snake! Store body segments in array, each follows the previous.',
+          hint: 'Each segment moves to where the previous segment was.',
+          starterCode: `let snake = [];
+let dir = { x: 1, y: 0 };
+let gridSize = 15;
+let speed = 8;
+
+function setup() {
+  // Create initial snake
+  for (let i = 0; i < 5; i++) {
+    snake.push({ x: 100 - i * gridSize, y: 160 });
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Move every few frames for grid movement
+  if (frameCount % speed === 0) {
+    // Remove tail, add new head
+    snake.pop();
+    let head = snake[0];
+    snake.unshift({ 
+      x: head.x + dir.x * gridSize,
+      y: head.y + dir.y * gridSize
+    });
+    
+    // Wrap around screen
+    let newHead = snake[0];
+    if (newHead.x < 0) newHead.x = width - gridSize;
+    if (newHead.x >= width) newHead.x = 0;
+    if (newHead.y < 0) newHead.y = height - gridSize;
+    if (newHead.y >= height) newHead.y = 0;
+  }
+  
+  // Draw snake
+  for (let i = 0; i < snake.length; i++) {
+    let seg = snake[i];
+    fill(0, 200 + i * 5, 100 + i * 10);
+    noStroke();
+    rect(seg.x, seg.y, gridSize - 2, gridSize - 2, 3);
+  }
+}
+
+function keyPressed() {
+  if (keyCode === UP_ARROW && dir.y !== 1) dir = { x: 0, y: -1 };
+  if (keyCode === DOWN_ARROW && dir.y !== -1) dir = { x: 0, y: 1 };
+  if (keyCode === LEFT_ARROW && dir.x !== 1) dir = { x: -1, y: 0 };
+  if (keyCode === RIGHT_ARROW && dir.x !== -1) dir = { x: 1, y: 0 };
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-13',
+          name: 'Flocking Boids',
+          desc: 'Emergent behavior',
+          mission: 'Create boids that flock! Rules: separation, alignment, cohesion.',
+          hint: 'Each boid adjusts velocity based on nearby boids.',
+          starterCode: `let boids = [];
+
+function setup() {
+  for (let i = 0; i < 50; i++) {
+    boids.push({
+      x: random(width),
+      y: random(height),
+      vx: random(-2, 2),
+      vy: random(-2, 2)
+    });
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  for (let boid of boids) {
+    // Simple flocking: steer toward center
+    let cx = 0, cy = 0, count = 0;
+    
+    for (let other of boids) {
+      let d = dist(boid.x, boid.y, other.x, other.y);
+      if (d < 50 && d > 0) {
+        cx += other.x;
+        cy += other.y;
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      cx /= count;
+      cy /= count;
+      boid.vx += (cx - boid.x) * 0.001;
+      boid.vy += (cy - boid.y) * 0.001;
+    }
+    
+    // Limit speed
+    let speed = sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
+    if (speed > 3) {
+      boid.vx = (boid.vx / speed) * 3;
+      boid.vy = (boid.vy / speed) * 3;
+    }
+    
+    // Move
+    boid.x += boid.vx;
+    boid.y += boid.vy;
+    
+    // Wrap
+    if (boid.x < 0) boid.x = width;
+    if (boid.x > width) boid.x = 0;
+    if (boid.y < 0) boid.y = height;
+    if (boid.y > height) boid.y = 0;
+    
+    // Draw as triangle pointing in direction
+    push();
+    translate(boid.x, boid.y);
+    rotate(atan2(boid.vy, boid.vx));
+    fill(100, 200, 255);
+    noStroke();
+    triangle(8, 0, -5, 4, -5, -4);
+    pop();
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-14',
+          name: 'Space Shooter',
+          desc: 'Bullets and enemies',
+          mission: 'Create a shooter! Spawn bullets on click, check collision with enemies.',
+          hint: 'Arrays for bullets and enemies. Loop and check collisions.',
+          starterCode: `let player = { x: 225, y: 280 };
+let bullets = [];
+let enemies = [];
+
+function setup() {
+  // Spawn initial enemies
+  for (let i = 0; i < 5; i++) {
+    enemies.push({
+      x: random(50, 400),
+      y: random(30, 100),
+      vx: random(-1, 1)
+    });
+  }
+}
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Move player with mouse
+  player.x = constrain(mouseX || 225, 20, width - 20);
+  
+  // Update bullets
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    bullets[i].y -= 8;
+    if (bullets[i].y < 0) bullets.splice(i, 1);
+  }
+  
+  // Update enemies
+  for (let enemy of enemies) {
+    enemy.x += enemy.vx;
+    if (enemy.x < 20 || enemy.x > width - 20) enemy.vx *= -1;
+  }
+  
+  // Check collisions
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      if (dist(bullets[i].x, bullets[i].y, enemies[j].x, enemies[j].y) < 20) {
+        bullets.splice(i, 1);
+        enemies[j].x = random(50, 400);
+        enemies[j].y = random(30, 100);
+        break;
+      }
+    }
+  }
+  
+  // Draw player
+  fill(0, 255, 136);
+  noStroke();
+  triangle(player.x, player.y - 15, player.x - 12, player.y + 10, player.x + 12, player.y + 10);
+  
+  // Draw bullets
+  fill(255, 255, 100);
+  for (let b of bullets) {
+    rect(b.x - 2, b.y, 4, 10, 2);
+  }
+  
+  // Draw enemies
+  fill(255, 80, 80);
+  for (let e of enemies) {
+    circle(e.x, e.y, 24);
+  }
+}
+
+function mousePressed() {
+  bullets.push({ x: player.x, y: player.y - 15 });
+}`,
+          check: (p) => p.frameCount > 30
+        },
+        {
+          id: 'anim-15',
+          name: 'Platformer',
+          desc: 'Jump and land',
+          mission: 'Create platformer physics! Jump with spacebar, land on platforms.',
+          hint: 'Check if player is above platform and falling to land on it.',
+          starterCode: `let player = { x: 100, y: 200, vy: 0, onGround: false };
+let platforms = [
+  { x: 0, y: 290, w: 450, h: 20 },
+  { x: 100, y: 220, w: 80, h: 15 },
+  { x: 250, y: 180, w: 100, h: 15 },
+  { x: 50, y: 130, w: 70, h: 15 }
+];
+
+function draw() {
+  background(10, 10, 18);
+  
+  // Horizontal movement
+  if (keyIsDown(LEFT_ARROW)) player.x -= 4;
+  if (keyIsDown(RIGHT_ARROW)) player.x += 4;
+  
+  // Gravity
+  player.vy += 0.5;
+  player.y += player.vy;
+  player.onGround = false;
+  
+  // Platform collision
+  for (let plat of platforms) {
+    if (player.x > plat.x - 10 && 
+        player.x < plat.x + plat.w + 10 &&
+        player.y > plat.y - 20 &&
+        player.y < plat.y + 5 &&
+        player.vy > 0) {
+      player.y = plat.y - 15;
+      player.vy = 0;
+      player.onGround = true;
+    }
+  }
+  
+  // Draw platforms
+  fill(60, 60, 80);
+  noStroke();
+  for (let plat of platforms) {
+    rect(plat.x, plat.y, plat.w, plat.h, 4);
+  }
+  
+  // Draw player
+  fill(0, 255, 136);
+  rect(player.x - 10, player.y - 15, 20, 30, 4);
+}
+
+function keyPressed() {
+  if (key === ' ' && player.onGround) {
+    player.vy = -12;
+  }
+}`,
+          check: (p) => p.frameCount > 30
+        }
+      ],
+      sandbox: []
+    };
+
+    let currentMode = 'art';
+    let currentLevelIndex = 0;
+    let p5Instance = null;
+    let isRunning = false;
+    let completedLevels = JSON.parse(localStorage.getItem('creativeProgress') || '{}');
+
+    // DOM Elements
+    const tabs = document.querySelectorAll('.tab');
+    const levelList = document.getElementById('levelList');
+    const codeEditor = document.getElementById('codeEditor');
+    const lineNumbers = document.getElementById('lineNumbers');
+    const runBtn = document.getElementById('runBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const hintBox = document.getElementById('hintBox');
+    const missionText = document.getElementById('missionText');
+    const visualizer = document.getElementById('visualizer');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const successOverlay = document.getElementById('successOverlay');
+    const successMessage = document.getElementById('successMessage');
+    const nextChallengeBtn = document.getElementById('nextChallengeBtn');
+
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentMode = tab.dataset.mode;
+        currentLevelIndex = 0;
+        visualizer.style.display = currentMode === 'music' ? 'flex' : 'none';
+        renderLevelList();
+        if (CREATIVE_LEVELS[currentMode]?.length > 0) {
+          loadLevel(0);
+        } else {
+          loadSandbox();
+        }
+      });
+    });
+
+    function renderLevelList() {
+      const levels = CREATIVE_LEVELS[currentMode] || [];
+
+      if (levels.length === 0) {
+        levelList.innerHTML = `
+                    <div style="padding: 20px; color: #6a6a8a; text-align: center;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🧪</div>
+                        <div>Free coding mode!</div>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">No challenges - just experiment</div>
+                    </div>
+                `;
+        return;
+      }
+
+      levelList.innerHTML = levels.map((level, i) => `
+                <div class="level-item ${i === currentLevelIndex ? 'active' : ''} ${completedLevels[level.id] ? 'completed' : ''}" 
+                     data-index="${i}">
+                    <div class="level-num">${completedLevels[level.id] ? '✓ ' : ''}Challenge ${i + 1}</div>
+                    <div class="level-name">${level.name}</div>
+                    <div class="level-desc">${level.desc}</div>
+                </div>
+            `).join('');
+
+      levelList.querySelectorAll('.level-item').forEach(item => {
+        item.addEventListener('click', () => {
+          loadLevel(parseInt(item.dataset.index));
+        });
+      });
+    }
+
+    function loadLevel(index) {
+      const levels = CREATIVE_LEVELS[currentMode];
+      if (!levels || index >= levels.length) return;
+
+      currentLevelIndex = index;
+      const level = levels[index];
+
+      missionText.textContent = level.mission;
+      hintBox.innerHTML = `<strong>💡 Hint:</strong> ${level.hint}`;
+      codeEditor.value = level.starterCode;
+      updateLineNumbers();
+      renderLevelList();
+      stopExecution();
+    }
+
+    function loadSandbox() {
+      missionText.textContent = 'Free mode - experiment with creative coding!';
+      hintBox.innerHTML = '<strong>💡 Tip:</strong> Try combining everything you learned!';
+      codeEditor.value = `// 🧪 SANDBOX - Go wild!
+
+function setup() {
+  background(10, 10, 18);
+}
+
+function draw() {
+  // Your creative code here!
+  
+}`;
+      updateLineNumbers();
+    }
+
+    codeEditor.addEventListener('input', updateLineNumbers);
+    codeEditor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = e.target.selectionStart;
+        e.target.value = e.target.value.substring(0, s) + '  ' + e.target.value.substring(e.target.selectionEnd);
+        e.target.selectionStart = e.target.selectionEnd = s + 2;
+        updateLineNumbers();
+      }
+    });
+
+    function updateLineNumbers() {
+      const lines = codeEditor.value.split('\n').length;
+      lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => `<div>${i + 1}</div>`).join('');
+    }
+
+    // Run button
+    runBtn.addEventListener('click', () => {
+      stopExecution();
+      if (currentMode === 'music') {
+        runMusic();
+      } else {
+        runP5();
+      }
+    });
+
+    stopBtn.addEventListener('click', stopExecution);
+
+    resetBtn.addEventListener('click', () => {
+      stopExecution();
+      const levels = CREATIVE_LEVELS[currentMode];
+      if (levels && levels[currentLevelIndex]) {
+        codeEditor.value = levels[currentLevelIndex].starterCode;
+        updateLineNumbers();
+      }
+    });
+
+    checkBtn.addEventListener('click', checkSolution);
+    nextChallengeBtn.addEventListener('click', () => {
+      successOverlay.classList.add('hidden');
+      const levels = CREATIVE_LEVELS[currentMode];
+      if (currentLevelIndex < levels.length - 1) {
+        loadLevel(currentLevelIndex + 1);
+      }
+    });
+
+    function checkSolution() {
+      const levels = CREATIVE_LEVELS[currentMode];
+      if (!levels || !levels[currentLevelIndex]) return;
+
+      const level = levels[currentLevelIndex];
+
+      // Run the code first
+      if (currentMode !== 'music') {
+        runP5();
+      }
+
+      setTimeout(() => {
+        let passed = false;
+        try {
+          if (level.check && p5Instance) {
+            passed = level.check(p5Instance);
+          } else {
+            passed = true; // Music levels auto-pass for now
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (passed) {
+          completedLevels[level.id] = true;
+          localStorage.setItem('creativeProgress', JSON.stringify(completedLevels));
+          successMessage.textContent = `You've mastered: ${level.name}`;
+          successOverlay.classList.remove('hidden');
+          renderLevelList();
+        } else {
+          alert('Not quite! Check the hint and try again.');
+        }
+      }, 500);
+    }
+
+    function runP5() {
+      const code = codeEditor.value;
+
+      if (p5Instance) {
+        p5Instance.remove();
+      }
+
+      try {
+        p5Instance = new p5((p) => {
+          let userSetup = null;
+          let userDraw = null;
+
+          // Parse user code
+          try {
+            const fn = new Function('p', `
+                            with(p) {
+                                ${code}
+                                return { 
+                                    setup: typeof setup !== 'undefined' ? setup : null, 
+                                    draw: typeof draw !== 'undefined' ? draw : null 
+                                };
+                            }
+                        `);
+            const fns = fn(p);
+            userSetup = fns.setup;
+            userDraw = fns.draw;
+          } catch (e) {
+            console.error(e);
+          }
+
+          p.setup = function () {
+            const canvas = p.createCanvas(450, 320);
+            canvas.parent(canvasContainer);
+            p.background(10, 10, 18);
+            if (userSetup) userSetup.call(p);
+          };
+
+          p.draw = function () {
+            if (userDraw) userDraw.call(p);
+          };
+        });
+
+        isRunning = true;
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    let audioContext = null;
+
+    function runMusic() {
+      const code = codeEditor.value;
+
+      try {
+        const userFn = new Function(`${code}\nreturn onRun();`);
+        const notes = userFn();
+
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        visualizer.innerHTML = '';
+        for (let i = 0; i < 16; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'viz-bar';
+          bar.style.height = '5px';
+          visualizer.appendChild(bar);
+        }
+        const bars = visualizer.querySelectorAll('.viz-bar');
+
+        notes.forEach((note, i) => {
+          setTimeout(() => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = note.freq;
+            gain.gain.value = 0.3;
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+
+            const barIndex = i % bars.length;
+            bars[barIndex].style.height = (note.freq / 10) + 'px';
+
+            setTimeout(() => {
+              gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+              setTimeout(() => osc.stop(), 100);
+              bars[barIndex].style.height = '5px';
+            }, note.duration);
+          }, note.delay);
+        });
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    function stopExecution() {
+      isRunning = false;
+      if (p5Instance) {
+        p5Instance.noLoop();
+      }
+    }
+
+    // Initialize
+    renderLevelList();
+    loadLevel(0);
+    updateLineNumbers();
+
+    // Initialize empty canvas
+    p5Instance = new p5((p) => {
+      p.setup = function () {
+        const canvas = p.createCanvas(450, 320);
+        canvas.parent(canvasContainer);
+        p.background(10, 10, 18);
+        p.fill(60);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textSize(16);
+        p.text('Click "Run" to see your creation!', p.width / 2, p.height / 2);
+      };
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>p5.js Algorithm Visualizations Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a12;
+            color: #e8e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px;
+            background: #12121c;
+            border-bottom: 1px solid #2a2a3a;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #8888a0;
+            font-size: 0.9rem;
+        }
+
+        .demos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .demo-card {
+            background: #12121c;
+            border: 1px solid #2a2a3a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .demo-header {
+            padding: 15px 20px;
+            background: #1a1a28;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo-title {
+            font-weight: 600;
+        }
+
+        .demo-btn {
+            background: #00ff88;
+            color: #0a0a12;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .demo-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>⚡ p5.js Algorithm Visualizations</h1>
+        <p class="subtitle">Interactive demos showing what we can add to Code Arena</p>
+    </header>
+
+    <div class="demos">
+        <div class="demo-card">
+            <div class="demo-header">
+                <span class="demo-title">🔢 Sorting Visualization</span>
+                <button class="demo-btn" onclick="resetSort()">Reset & Sort</button>
+            </div>
+            <div class="canvas-container" id="sort-container"></div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-header">
+                <span class="demo-title">🎉 Particle Explosion</span>
+                <button class="demo-btn" onclick="explode()">Explode!</button>
+            </div>
+            <div class="canvas-container" id="particle-container"></div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-header">
+                <span class="demo-title">🌐 Graph Traversal (BFS)</span>
+                <button class="demo-btn" onclick="startBFS()">Start BFS</button>
+            </div>
+            <div class="canvas-container" id="graph-container"></div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-header">
+                <span class="demo-title">🌳 Binary Tree</span>
+                <button class="demo-btn" onclick="traverseTree()">Traverse</button>
+            </div>
+            <div class="canvas-container" id="tree-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== SORTING VISUALIZATION ==========
+        let sortSketch = function (p) {
+            let arr = [];
+            let sorting = false;
+            let i = 0, j = 0;
+            let barWidth;
+            const W = 420, H = 250;
+
+            p.setup = function () {
+                let canvas = p.createCanvas(W, H);
+                canvas.parent('sort-container');
+                resetArray();
+            };
+
+            function resetArray() {
+                arr = [];
+                for (let k = 0; k < 30; k++) {
+                    arr.push({
+                        value: p.random(20, H - 20),
+                        color: p.color(68, 136, 255),
+                        targetY: 0
+                    });
+                }
+                barWidth = (W - 40) / arr.length;
+                i = 0; j = 0;
+            }
+
+            window.resetSort = function () {
+                resetArray();
+                sorting = true;
+            };
+
+            p.draw = function () {
+                p.background(10, 10, 18);
+
+                // Draw bars with animation
+                for (let k = 0; k < arr.length; k++) {
+                    let x = 20 + k * barWidth;
+                    let h = arr[k].value;
+
+                    // Gradient color based on height
+                    let c = p.lerpColor(p.color(68, 136, 255), p.color(0, 255, 136), h / H);
+                    if (k === j || k === j + 1) c = p.color(255, 170, 0); // Highlight comparing
+
+                    p.noStroke();
+                    p.fill(c);
+                    p.rect(x, H - h, barWidth - 2, h, 3);
+                }
+
+                // Bubble sort step
+                if (sorting) {
+                    if (i < arr.length) {
+                        if (j < arr.length - i - 1) {
+                            if (arr[j].value > arr[j + 1].value) {
+                                let temp = arr[j];
+                                arr[j] = arr[j + 1];
+                                arr[j + 1] = temp;
+                            }
+                            j++;
+                        } else {
+                            j = 0;
+                            i++;
+                        }
+                    } else {
+                        sorting = false;
+                        // All green when done
+                        arr.forEach(a => a.color = p.color(0, 255, 136));
+                    }
+                }
+            };
+        };
+        new p5(sortSketch);
+
+        // ========== PARTICLE EXPLOSION ==========
+        let particleSketch = function (p) {
+            let particles = [];
+            const W = 420, H = 250;
+
+            p.setup = function () {
+                let canvas = p.createCanvas(W, H);
+                canvas.parent('particle-container');
+            };
+
+            window.explode = function () {
+                for (let i = 0; i < 100; i++) {
+                    particles.push({
+                        x: W / 2,
+                        y: H / 2,
+                        vx: p.random(-8, 8),
+                        vy: p.random(-10, 2),
+                        size: p.random(5, 15),
+                        color: p.color(
+                            p.random([255, 0, 68, 255]),
+                            p.random([136, 255, 136, 170]),
+                            p.random([255, 136, 255, 0])
+                        ),
+                        life: 255
+                    });
+                }
+            };
+
+            p.draw = function () {
+                p.background(10, 10, 18, 40);
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    let pt = particles[i];
+
+                    pt.x += pt.vx;
+                    pt.y += pt.vy;
+                    pt.vy += 0.2; // gravity
+                    pt.life -= 4;
+                    pt.size *= 0.98;
+
+                    if (pt.life <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    p.noStroke();
+                    pt.color.setAlpha(pt.life);
+                    p.fill(pt.color);
+                    p.ellipse(pt.x, pt.y, pt.size);
+                }
+
+                // Draw hint text if no particles
+                if (particles.length === 0) {
+                    p.fill(80);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(14);
+                    p.text('Click "Explode!" to see confetti', W / 2, H / 2);
+                }
+            };
+        };
+        new p5(particleSketch);
+
+        // ========== GRAPH TRAVERSAL ==========
+        let graphSketch = function (p) {
+            let nodes = [];
+            let edges = [];
+            let visited = [];
+            let queue = [];
+            let bfsRunning = false;
+            const W = 420, H = 250;
+
+            p.setup = function () {
+                let canvas = p.createCanvas(W, H);
+                canvas.parent('graph-container');
+                createGraph();
+            };
+
+            function createGraph() {
+                nodes = [
+                    { x: W / 2, y: 50, id: 0 },
+                    { x: W / 4, y: 120, id: 1 },
+                    { x: 3 * W / 4, y: 120, id: 2 },
+                    { x: W / 6, y: 200, id: 3 },
+                    { x: W / 3, y: 200, id: 4 },
+                    { x: 2 * W / 3, y: 200, id: 5 },
+                    { x: 5 * W / 6, y: 200, id: 6 }
+                ];
+                edges = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]];
+                visited = new Array(nodes.length).fill(false);
+            }
+
+            window.startBFS = function () {
+                visited = new Array(nodes.length).fill(false);
+                queue = [0];
+                bfsRunning = true;
+            };
+
+            p.draw = function () {
+                p.background(10, 10, 18);
+
+                // Draw edges
+                p.stroke(60);
+                p.strokeWeight(2);
+                edges.forEach(e => {
+                    let n1 = nodes[e[0]], n2 = nodes[e[1]];
+                    p.line(n1.x, n1.y, n2.x, n2.y);
+                });
+
+                // Draw nodes
+                nodes.forEach((n, i) => {
+                    p.noStroke();
+                    if (visited[i]) {
+                        p.fill(0, 255, 136);
+                        // Glow
+                        p.drawingContext.shadowBlur = 20;
+                        p.drawingContext.shadowColor = 'rgba(0, 255, 136, 0.8)';
+                    } else {
+                        p.fill(68, 136, 255);
+                        p.drawingContext.shadowBlur = 0;
+                    }
+                    p.ellipse(n.x, n.y, 35);
+                    p.drawingContext.shadowBlur = 0;
+
+                    p.fill(255);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(14);
+                    p.text(i, n.x, n.y);
+                });
+
+                // BFS step
+                if (bfsRunning && p.frameCount % 30 === 0) {
+                    if (queue.length > 0) {
+                        let curr = queue.shift();
+                        if (!visited[curr]) {
+                            visited[curr] = true;
+                            edges.forEach(e => {
+                                if (e[0] === curr && !visited[e[1]]) queue.push(e[1]);
+                                if (e[1] === curr && !visited[e[0]]) queue.push(e[0]);
+                            });
+                        }
+                    } else {
+                        bfsRunning = false;
+                    }
+                }
+            };
+        };
+        new p5(graphSketch);
+
+        // ========== BINARY TREE ==========
+        let treeSketch = function (p) {
+            let treeNodes = [];
+            let visiting = -1;
+            let traverseIndex = 0;
+            let traverseOrder = [];
+            let traversing = false;
+            const W = 420, H = 250;
+
+            p.setup = function () {
+                let canvas = p.createCanvas(W, H);
+                canvas.parent('tree-container');
+                createTree();
+            };
+
+            function createTree() {
+                // Binary tree structure
+                treeNodes = [
+                    { x: W / 2, y: 40, value: 50, left: 1, right: 2 },
+                    { x: W / 4, y: 100, value: 30, left: 3, right: 4 },
+                    { x: 3 * W / 4, y: 100, value: 70, left: 5, right: 6 },
+                    { x: W / 8, y: 170, value: 20, left: -1, right: -1 },
+                    { x: 3 * W / 8, y: 170, value: 40, left: -1, right: -1 },
+                    { x: 5 * W / 8, y: 170, value: 60, left: -1, right: -1 },
+                    { x: 7 * W / 8, y: 170, value: 80, left: -1, right: -1 }
+                ];
+
+                // Inorder traversal order
+                traverseOrder = [3, 1, 4, 0, 5, 2, 6];
+            }
+
+            window.traverseTree = function () {
+                traverseIndex = 0;
+                visiting = -1;
+                traversing = true;
+                treeNodes.forEach(n => n.visited = false);
+            };
+
+            p.draw = function () {
+                p.background(10, 10, 18);
+
+                // Draw edges
+                p.stroke(60);
+                p.strokeWeight(2);
+                treeNodes.forEach(n => {
+                    if (n.left >= 0) {
+                        let child = treeNodes[n.left];
+                        p.line(n.x, n.y, child.x, child.y);
+                    }
+                    if (n.right >= 0) {
+                        let child = treeNodes[n.right];
+                        p.line(n.x, n.y, child.x, child.y);
+                    }
+                });
+
+                // Draw nodes
+                treeNodes.forEach((n, i) => {
+                    p.noStroke();
+
+                    if (i === visiting) {
+                        p.fill(255, 170, 0);
+                        p.drawingContext.shadowBlur = 25;
+                        p.drawingContext.shadowColor = 'rgba(255, 170, 0, 0.8)';
+                    } else if (n.visited) {
+                        p.fill(0, 255, 136);
+                        p.drawingContext.shadowBlur = 15;
+                        p.drawingContext.shadowColor = 'rgba(0, 255, 136, 0.6)';
+                    } else {
+                        p.fill(68, 136, 255);
+                        p.drawingContext.shadowBlur = 0;
+                    }
+
+                    p.ellipse(n.x, n.y, 40);
+                    p.drawingContext.shadowBlur = 0;
+
+                    p.fill(255);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(12);
+                    p.text(n.value, n.x, n.y);
+                });
+
+                // Label
+                p.fill(80);
+                p.textAlign(p.CENTER);
+                p.textSize(11);
+                p.text('Inorder Traversal', W / 2, H - 15);
+
+                // Traverse animation
+                if (traversing && p.frameCount % 40 === 0) {
+                    if (visiting >= 0) {
+                        treeNodes[visiting].visited = true;
+                    }
+
+                    if (traverseIndex < traverseOrder.length) {
+                        visiting = traverseOrder[traverseIndex];
+                        traverseIndex++;
+                    } else {
+                        visiting = -1;
+                        traversing = false;
+                    }
+                }
+            };
+        };
+        new p5(treeSketch);
+    </script>
+</body>
+
+</html>

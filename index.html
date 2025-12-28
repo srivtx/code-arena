@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Arena - Learn DSA Through Games</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+
+<body>
+    <div class="app" id="app">
+        <!-- World Select Screen -->
+        <div class="screen world-select-screen" id="worldSelectScreen">
+            <header class="screen-header">
+                <div class="logo">
+                    <div class="logo-icon">⚡</div>
+                    <span>Code Arena</span>
+                </div>
+                <div class="player-stats">
+                    <a href="learn.html" class="stat-pill" style="text-decoration:none; cursor:pointer;color:white ">
+                        <span class="stat-icon">📚</span>
+                        Learn
+                    </a>
+                    <!-- change the color of playground purple to white -->
+
+                    <div>
+                        <a href="playground.html" class="stat-pill"
+                            style="text-decoration:none; cursor:pointer;color:tomato">
+                            <span class="stat-icon">🎨</span>
+                            Playground
+                        </a>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">⭐</span>
+                        <span id="totalXP">0</span> XP
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-icon">🏆</span>
+                        <span id="completedCount">0</span>/96
+                    </div>
+                </div>
+            </header>
+
+            <main class="world-grid" id="worldGrid">
+                <!-- Worlds will be rendered here -->
+            </main>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div class="screen level-select-screen hidden" id="levelSelectScreen">
+            <header class="screen-header">
+                <button class="btn-back" id="backToWorlds">← Back</button>
+                <h1 class="world-title" id="worldTitle">World 1</h1>
+                <div class="world-progress">
+                    <span id="worldProgress">0/8</span> completed
+                </div>
+            </header>
+
+            <main class="level-grid" id="levelGrid">
+                <!-- Levels will be rendered here -->
+            </main>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen game-screen hidden" id="gameScreen">
+            <header class="game-header">
+                <button class="btn-back" id="backToLevels">← Levels</button>
+                <div class="level-info">
+                    <span class="level-badge" id="levelBadge">1.1</span>
+                    <span class="level-title" id="levelTitle">Level Name</span>
+                </div>
+                <div class="game-stats">
+                    <div class="stat-mini">
+                        <span class="stat-label">Score</span>
+                        <span class="stat-value" id="gameScore">0</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-label">Best</span>
+                        <span class="stat-value" id="gameBest">-</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="game-layout">
+                <!-- Canvas Area -->
+                <div class="canvas-area">
+                    <canvas id="gameCanvas"></canvas>
+
+                    <!-- Overlays -->
+                    <div class="game-overlay hidden" id="successOverlay">
+                        <div class="overlay-card success">
+                            <div class="overlay-icon">🎉</div>
+                            <h2>Level Complete!</h2>
+                            <div class="stars-display" id="starsDisplay">
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                                <span class="star">⭐</span>
+                            </div>
+                            <p class="xp-earned">+<span id="xpEarned">100</span> XP</p>
+                            <div class="reveal-box" id="revealBox">
+                                <div class="reveal-label">💡 What You Discovered</div>
+                                <p id="revealText"></p>
+                            </div>
+                            <div class="overlay-actions">
+                                <button class="btn btn-secondary" id="retryBtn">Try Again</button>
+                                <button class="btn btn-primary" id="nextLevelBtn">Next Level →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-overlay hidden" id="failOverlay">
+                        <div class="overlay-card fail">
+                            <div class="overlay-icon">💥</div>
+                            <h2>Not Quite Right</h2>
+                            <p class="fail-reason" id="failReason">Something went wrong</p>
+                            <div class="hint-box" id="hintBox">
+                                <div class="hint-label">💡 Hint</div>
+                                <p id="hintText"></p>
+                            </div>
+                            <button class="btn btn-primary" id="tryAgainBtn">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="editor-area">
+                    <div class="mission-box">
+                        <div class="mission-label">🎯 Mission</div>
+                        <p id="missionText">Complete the task</p>
+                    </div>
+
+                    <div class="editor-wrapper">
+                        <div class="editor-toolbar">
+                            <span class="file-name">solution.js</span>
+                            <button class="btn-icon" id="resetCodeBtn" title="Reset Code">↺</button>
+                        </div>
+                        <div class="editor-container">
+                            <div class="line-numbers" id="lineNumbers"></div>
+                            <textarea id="codeEditor" spellcheck="false"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="controls-bar">
+                        <button class="btn btn-primary btn-run" id="runBtn">
+                            <span class="btn-icon">▶</span> Run Code
+                        </button>
+                        <button class="btn btn-secondary" id="stepBtn">Step</button>
+                        <div class="speed-control">
+                            <label>Speed</label>
+                            <input type="range" id="speedSlider" min="1" max="5" value="3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast hidden" id="toast">
+        <span class="toast-icon">⚠</span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script src="levels.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>
