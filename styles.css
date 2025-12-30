@@ -637,35 +637,59 @@ body {
 .editor-container {
     flex: 1;
     display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 
 .line-numbers {
-    padding: 16px 12px;
-    background: var(--bg-input);
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    line-height: 1.7;
-    text-align: right;
-    user-select: none;
-    border-right: 1px solid var(--border);
-    min-width: 45px;
-    overflow: hidden;
+    display: none !important;
+    /* Hide old line numbers */
 }
 
 #codeEditor {
+    display: none !important;
+    /* Hidden - CodeMirror replaces it */
+}
+
+/* CodeMirror - Let it use its natural layout */
+.CodeMirror {
     flex: 1;
-    padding: 16px;
-    background: var(--bg-input);
-    border: none;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    line-height: 1.7;
-    resize: none;
-    outline: none;
-    overflow: auto;
+    height: 100% !important;
+    background: #0e0e16 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+    border: none !important;
+}
+
+.CodeMirror-gutters {
+    background: #0a0a12 !important;
+    border-right: 1px solid #2a2a3a !important;
+}
+
+.CodeMirror-linenumber {
+    color: #555566 !important;
+    padding: 0 8px 0 12px !important;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid #00ff88 !important;
+}
+
+.CodeMirror-selected {
+    background: rgba(68, 136, 255, 0.3) !important;
+}
+
+.CodeMirror-matchingbracket {
+    color: #00ff88 !important;
+    background: rgba(0, 255, 136, 0.2) !important;
+}
+
+.CodeMirror-activeline-background {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.CodeMirror-activeline .CodeMirror-linenumber {
+    color: #00ff88 !important;
 }
 
 .controls-bar {
@@ -799,4 +823,101 @@ body {
         border-left: none;
         border-top: 1px solid var(--border);
     }
+}
+
+/* =========================================
+   Advanced Sublevels
+   ========================================= */
+.advanced-section {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
+    border: 2px solid var(--purple);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.advanced-section.locked {
+    border-color: var(--border);
+    opacity: 0.8;
+}
+
+.advanced-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.advanced-badge {
+    background: linear-gradient(135deg, var(--purple), var(--info));
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+}
+
+.advanced-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.advanced-progress {
+    margin-left: auto;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+.advanced-lock-message {
+    background: var(--bg-elevated);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.advanced-grid.blurred {
+    filter: blur(3px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.advanced-card {
+    background: var(--bg-elevated);
+    border-color: var(--purple);
+}
+
+.advanced-card.completed {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(170, 102, 255, 0.1), var(--accent-dim));
+}
+
+.advanced-card .level-number {
+    color: var(--purple);
+}
+
+.level-card.boss-level {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), transparent);
+}
+
+.level-card.boss-level .level-number {
+    color: var(--warning);
+}
+
+.level-card.sub-boss {
+    border-color: var(--warning);
 }

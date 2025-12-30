@@ -11,6 +11,7 @@ class CodeArena {
         this.userFn = null;
         this.p5Instance = null;
         this.speed = 3;
+        this.codeMirror = null; // CodeMirror instance
 
         // Animation state
         this.animState = {
@@ -27,6 +28,7 @@ class CodeArena {
         this.progress = this.loadProgress();
 
         this.initDOM();
+        this.initCodeMirror();
         this.initEventListeners();
         this.showWorldSelect();
     }
@@ -80,20 +82,34 @@ class CodeArena {
         this.els.resetCodeBtn.addEventListener('click', () => this.resetCode());
         this.els.speedSlider.addEventListener('input', (e) => this.speed = parseInt(e.target.value));
 
-        this.els.codeEditor.addEventListener('input', () => this.updateLineNumbers());
-        this.els.codeEditor.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const s = e.target.selectionStart;
-                e.target.value = e.target.value.substring(0, s) + '  ' + e.target.value.substring(e.target.selectionEnd);
-                e.target.selectionStart = e.target.selectionEnd = s + 2;
-                this.updateLineNumbers();
-            }
-        });
-
         this.els.retryBtn.addEventListener('click', () => this.hideOverlays());
         this.els.nextLevelBtn.addEventListener('click', () => this.goToNextLevel());
         this.els.tryAgainBtn.addEventListener('click', () => this.hideOverlays());
+    }
+
+    // ==================== CODEMIRROR ====================
+    initCodeMirror() {
+        this.codeMirror = CodeMirror.fromTextArea(this.els.codeEditor, {
+            mode: 'javascript',
+            theme: 'material-darker',
+            lineNumbers: true,
+            indentUnit: 2,
+            tabSize: 2,
+            indentWithTabs: false,
+            lineWrapping: false,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            styleActiveLine: true,
+            extraKeys: {
+                'Tab': (cm) => cm.execCommand('indentMore'),
+                'Shift-Tab': (cm) => cm.execCommand('indentLess')
+            }
+        });
+
+        // Hide the old line numbers since CodeMirror has its own
+        if (this.els.lineNumbers) {
+            this.els.lineNumbers.style.display = 'none';
+        }
     }
 
     // ==================== PROGRESS ====================
@@ -115,16 +131,45 @@ class CodeArena {
     }
 
     isLevelUnlocked(level) {
-        const worldLevels = LEVELS.filter(l => l.world === level.world);
-        const levelIdx = worldLevels.findIndex(l => l.id === level.id);
+        // Advanced sublevels (like 1.A.1) require world boss completion
+        if (level.isAdvanced) {
+            // Find the world boss (main levels with isBoss)
+            const mainLevels = LEVELS.filter(l => l.world === level.world && !l.isAdvanced);
+            const worldBoss = mainLevels.find(l => l.isBoss);
+            if (!worldBoss || !this.isLevelCompleted(worldBoss.id)) return false;
+
+            // Within advanced levels, check sequential unlock
+            const advancedLevels = LEVELS.filter(l => l.world === level.world && l.isAdvanced);
+            const levelIdx = advancedLevels.findIndex(l => l.id === level.id);
+            if (levelIdx === 0) return true;
+            return this.isLevelCompleted(advancedLevels[levelIdx - 1].id);
+        }
+
+        // Normal levels unlock sequentially
+        const mainLevels = LEVELS.filter(l => l.world === level.world && !l.isAdvanced);
+        const levelIdx = mainLevels.findIndex(l => l.id === level.id);
         if (levelIdx === 0) return true;
-        return this.isLevelCompleted(worldLevels[levelIdx - 1].id);
+        return this.isLevelCompleted(mainLevels[levelIdx - 1].id);
     }
 
     getWorldProgress(worldId) {
-        const worldLevels = LEVELS.filter(l => l.world === worldId);
-        const completed = worldLevels.filter(l => this.isLevelCompleted(l.id)).length;
-        return { completed, total: worldLevels.length };
+        // Only count main levels (not advanced) for world progress
+        const mainLevels = LEVELS.filter(l => l.world === worldId && !l.isAdvanced);
+        const completed = mainLevels.filter(l => this.isLevelCompleted(l.id)).length;
+        return { completed, total: mainLevels.length };
+    }
+
+    getAdvancedProgress(worldId) {
+        const advancedLevels = LEVELS.filter(l => l.world === worldId && l.isAdvanced);
+        const completed = advancedLevels.filter(l => this.isLevelCompleted(l.id)).length;
+        return { completed, total: advancedLevels.length };
+    }
+
+    isAdvancedUnlocked(worldId) {
+        // Advanced subworld unlocks when world boss is completed
+        const mainLevels = LEVELS.filter(l => l.world === worldId && !l.isAdvanced);
+        const worldBoss = mainLevels.find(l => l.isBoss);
+        return worldBoss && this.isLevelCompleted(worldBoss.id);
     }
 
     getTotalCompleted() {
@@ -194,16 +239,21 @@ class CodeArena {
     }
 
     renderLevels(worldId) {
-        const worldLevels = LEVELS.filter(l => l.world === worldId);
-        this.els.levelGrid.innerHTML = worldLevels.map(level => {
+        const mainLevels = LEVELS.filter(l => l.world === worldId && !l.isAdvanced);
+        const advancedLevels = LEVELS.filter(l => l.world === worldId && l.isAdvanced);
+        const advancedUnlocked = this.isAdvancedUnlocked(worldId);
+
+        // Render main levels
+        let html = mainLevels.map(level => {
             const completed = this.isLevelCompleted(level.id);
             const unlocked = this.isLevelUnlocked(level);
             const stars = this.progress.bestScores[level.id] || 0;
+            const isBoss = level.isBoss ? 'boss-level' : '';
 
             return `
-                <div class="level-card ${completed ? 'completed' : ''} ${unlocked ? '' : 'locked'}" data-level="${level.id}">
+                <div class="level-card ${completed ? 'completed' : ''} ${unlocked ? '' : 'locked'} ${isBoss}" data-level="${level.id}">
                     <div class="level-header">
-                        <span class="level-number">Level ${level.id}</span>
+                        <span class="level-number">${level.isBoss ? '🏆' : ''} Level ${level.id}</span>
                         <div class="level-stars">
                             ${[1, 2, 3].map(s => `<span class="star ${s <= stars ? 'earned' : ''}">⭐</span>`).join('')}
                         </div>
@@ -214,6 +264,45 @@ class CodeArena {
                 </div>
             `;
         }).join('');
+
+        // Render advanced sublevels section if any exist
+        if (advancedLevels.length > 0) {
+            const advProg = this.getAdvancedProgress(worldId);
+            html += `
+                <div class="advanced-section ${advancedUnlocked ? '' : 'locked'}">
+                    <div class="advanced-header">
+                        <span class="advanced-badge">🔓 ADVANCED</span>
+                        <span class="advanced-title">Subworld Challenges</span>
+                        <span class="advanced-progress">${advProg.completed}/${advProg.total}</span>
+                    </div>
+                    ${!advancedUnlocked ? '<div class="advanced-lock-message">Complete World Boss to Unlock</div>' : ''}
+                    <div class="advanced-grid ${advancedUnlocked ? '' : 'blurred'}">
+                        ${advancedLevels.map(level => {
+                const completed = this.isLevelCompleted(level.id);
+                const unlocked = advancedUnlocked && this.isLevelUnlocked(level);
+                const stars = this.progress.bestScores[level.id] || 0;
+                const isBoss = level.isBoss ? 'sub-boss' : '';
+
+                return `
+                                <div class="level-card advanced-card ${completed ? 'completed' : ''} ${unlocked ? '' : 'locked'} ${isBoss}" data-level="${level.id}">
+                                    <div class="level-header">
+                                        <span class="level-number">${level.isBoss ? '🏆' : '🔓'} ${level.id}</span>
+                                        <div class="level-stars">
+                                            ${[1, 2, 3].map(s => `<span class="star ${s <= stars ? 'earned' : ''}">⭐</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="level-name">${level.name}</div>
+                                    <p class="level-desc">${level.desc}</p>
+                                    ${!unlocked ? '<span class="level-lock">🔒</span>' : ''}
+                                </div>
+                            `;
+            }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        this.els.levelGrid.innerHTML = html;
 
         this.els.levelGrid.querySelectorAll('.level-card:not(.locked)').forEach(card => {
             card.addEventListener('click', () => this.startLevel(card.dataset.level));
@@ -233,13 +322,18 @@ class CodeArena {
         this.els.levelBadge.textContent = this.currentLevel.id;
         this.els.levelTitle.textContent = this.currentLevel.name;
         this.els.missionText.textContent = this.currentLevel.mission;
-        this.els.codeEditor.value = this.currentLevel.starterCode;
+        this.codeMirror.setValue(this.currentLevel.starterCode);
         this.els.gameScore.textContent = '0';
         this.els.gameBest.textContent = this.progress.bestScores[levelId] || '-';
 
         this.updateLineNumbers();
         this.hideOverlays();
         this.initGameState();
+
+        // Refresh CodeMirror after it becomes visible so it calculates gutter width correctly
+        setTimeout(() => {
+            this.codeMirror.refresh();
+        }, 10);
 
         // Initialize p5.js
         setTimeout(() => this.initP5(), 100);
@@ -296,8 +390,7 @@ class CodeArena {
     }
 
     updateLineNumbers() {
-        const lines = this.els.codeEditor.value.split('\n').length;
-        this.els.lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => `<div>${i + 1}</div>`).join('');
+        // CodeMirror handles line numbers automatically
     }
 
     // ==================== P5.JS VISUALIZATION ====================
@@ -628,7 +721,7 @@ class CodeArena {
 
     compileCode() {
         try {
-            const code = this.els.codeEditor.value;
+            const code = this.codeMirror.getValue();
             const fn = new Function(`${code}\nreturn solve;`)();
             if (typeof fn !== 'function') {
                 throw new Error('Function "solve" not found');
@@ -710,7 +803,7 @@ class CodeArena {
     }
 
     resetCode() {
-        this.els.codeEditor.value = this.currentLevel.starterCode;
+        this.codeMirror.setValue(this.currentLevel.starterCode);
         this.updateLineNumbers();
         this.initGameState();
         if (this.p5Instance) {

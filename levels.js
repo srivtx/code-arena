@@ -87,6 +87,34 @@ const WORLDS = [
         icon: "👑",
         desc: "Make optimal choices at each step. Learn when good-enough is perfect.",
         concept: "Greedy Algorithms"
+    },
+    {
+        id: 13,
+        name: "E-Commerce Platform",
+        icon: "🛒",
+        desc: "Build a shopping backend. Master the art of efficient product filtering and matching.",
+        concept: "Two Pointers"
+    },
+    {
+        id: 14,
+        name: "Streaming Service",
+        icon: "🎬",
+        desc: "Build video analytics. Learn to analyze sequences and patterns in data streams.",
+        concept: "Sliding Window"
+    },
+    {
+        id: 15,
+        name: "Calendar App",
+        icon: "📅",
+        desc: "Build a scheduling system. Master time-based operations and conflict resolution.",
+        concept: "Intervals"
+    },
+    {
+        id: 16,
+        name: "Spell Checker",
+        icon: "🔤",
+        desc: "Build autocomplete and spell checking. Master the Trie data structure for fast string operations.",
+        concept: "Tries"
     }
 ];
 
@@ -237,9 +265,9 @@ const LEVELS = [
         world: 1,
         name: "Warehouse Audit",
         desc: "🏆 BOSS: Complete inventory system",
-        mission: "Return {totalItems, totalValue, lowStockCount, hasDefective}",
-        hint: "Combine all your skills together.",
-        reveal: "You've mastered ARRAY FUNDAMENTALS!",
+        mission: "The warehouse needs a full audit report! Given an array of products (each with id, price, and quantity), calculate: 1) Total items in stock (sum of all quantities), 2) Total inventory value (sum of price × quantity), 3) Low stock count (how many products have quantity < 10), 4) Has defective (true if ANY product has id < 100). Return an object with these 4 properties.",
+        hint: "Loop through products once - calculate all 4 values in a single pass using everything you've learned!",
+        reveal: "You've mastered ARRAY FUNDAMENTALS - iteration, filtering, mapping, and aggregation all in one!",
         starterCode: `function solve(products) {
   // products = [{id, price, quantity}, ...]
   // Return: {
@@ -268,6 +296,149 @@ const LEVELS = [
         ],
         xpReward: 150,
         isBoss: true
+    },
+
+    // ==================== WORLD 1.A: ADVANCED WAREHOUSE (SUBLEVELS) ====================
+    {
+        id: "1.A.1",
+        world: 1,
+        name: "Two Item Lookup",
+        desc: "🔓 ADVANCED: Find pair summing to target.",
+        mission: "A customer wants to spend EXACTLY their gift card amount. Given product prices and a target value, find TWO products that sum to exactly the target. Return their indices [i, j] where i < j. This is the famous Two Sum!",
+        hint: "Use a hash map to store seen values and their indices. For each price, check if (target - price) exists.",
+        reveal: "Two Sum - THE most common interview question! Hash map gives O(n) time!",
+        starterCode: `function solve(prices, target) {
+  // Return [i, j] where prices[i] + prices[j] = target
+  // Return [] if no such pair exists
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[2, 7, 11, 15], 9], expected: [0, 1] },
+            { input: [[3, 2, 4], 6], expected: [1, 2] },
+            { input: [[3, 3], 6], expected: [0, 1] }
+        ],
+        xpReward: 120,
+        isAdvanced: true
+    },
+    {
+        id: "1.A.2",
+        world: 1,
+        name: "Rotate Stock",
+        desc: "🔓 ADVANCED: Rotate inventory positions.",
+        mission: "Warehouse reorganization! Rotate the inventory array to the right by K positions. Items that fall off the right appear on the left. Do it IN-PLACE with O(1) extra space!",
+        hint: "The trick: reverse entire array, then reverse first K, then reverse the rest. Three reversals!",
+        reveal: "Array Rotation - the reversal algorithm is elegant! O(n) time, O(1) space!",
+        starterCode: `function solve(inventory, k) {
+  // Rotate array right by k positions in-place
+  // Return the modified array
+  
+  return inventory;
+}`,
+        testCases: [
+            { input: [[1, 2, 3, 4, 5, 6, 7], 3], expected: [5, 6, 7, 1, 2, 3, 4] },
+            { input: [[-1, -100, 3, 99], 2], expected: [3, 99, -1, -100] },
+            { input: [[1, 2], 3], expected: [2, 1] }
+        ],
+        xpReward: 130,
+        isAdvanced: true
+    },
+    {
+        id: "1.A.3",
+        world: 1,
+        name: "Missing Shipment",
+        desc: "🔓 ADVANCED: Find the missing item.",
+        mission: "A shipment should contain items numbered 0 to n, but ONE is missing! Given an array of n distinct numbers in range [0, n], find the missing number. Use O(1) extra space!",
+        hint: "Math trick: sum of 0 to n is n*(n+1)/2. Or use XOR: a^a=0, a^0=a.",
+        reveal: "Missing Number - use math sum or XOR magic! Both are O(n) time, O(1) space!",
+        starterCode: `function solve(shipment) {
+  // shipment contains n numbers from 0 to n (one missing)
+  // Return the missing number
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[3, 0, 1]], expected: 2 },
+            { input: [[0, 1]], expected: 2 },
+            { input: [[9, 6, 4, 2, 3, 5, 7, 0, 1]], expected: 8 }
+        ],
+        xpReward: 110,
+        isAdvanced: true
+    },
+    {
+        id: "1.A.4",
+        world: 1,
+        name: "Majority Supplier",
+        desc: "🔓 ADVANCED: Find the dominant element.",
+        mission: "One supplier provides MORE than half of all products. Find which supplier ID appears more than n/2 times. They're guaranteed to exist. Use O(1) space!",
+        hint: "Boyer-Moore Voting Algorithm: keep a candidate and count. Increment for same, decrement for different. Winner survives!",
+        reveal: "Majority Element - Boyer-Moore is brilliant! The majority survives all cancellations!",
+        starterCode: `function solve(suppliers) {
+  // Find element appearing more than n/2 times
+  // O(1) extra space required
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[3, 2, 3]], expected: 3 },
+            { input: [[2, 2, 1, 1, 1, 2, 2]], expected: 2 },
+            { input: [[1]], expected: 1 }
+        ],
+        xpReward: 140,
+        isAdvanced: true
+    },
+    {
+        id: "1.A.5",
+        world: 1,
+        name: "Stock Profit",
+        desc: "🔓 ADVANCED: Best time to buy and sell.",
+        mission: "You can buy on one day and sell on a later day. Given daily stock prices, find the maximum profit possible. If no profit is possible, return 0.",
+        hint: "Track the minimum price seen so far. For each day, calculate potential profit and track maximum.",
+        reveal: "Best Time to Buy and Sell Stock - single pass! Track min and max profit!",
+        starterCode: `function solve(prices) {
+  // Return maximum profit from one buy and one sell
+  // Must buy before selling
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[7, 1, 5, 3, 6, 4]], expected: 5 },
+            { input: [[7, 6, 4, 3, 1]], expected: 0 },
+            { input: [[2, 4, 1]], expected: 2 }
+        ],
+        xpReward: 120,
+        isAdvanced: true
+    },
+    {
+        id: "1.A.6",
+        world: 1,
+        name: "Advanced Warehouse Master",
+        desc: "🏆 SUB-BOSS: All advanced patterns.",
+        mission: "Prove your advanced array mastery! Return: 1) Indices of two items summing to target, 2) The missing number from 0-n sequence, 3) Maximum stock profit possible.",
+        hint: "Combine hash map for two-sum, math/XOR for missing, and min-tracking for profit!",
+        reveal: "You've conquered ADVANCED ARRAYS - ready for any interview!",
+        starterCode: `function solve(prices, target, sequence, stockPrices) {
+  // Return: {
+  //   twoSum: [i, j] where prices[i] + prices[j] = target
+  //   missingNum: the missing number in sequence
+  //   maxProfit: best profit from stockPrices
+  // }
+  
+  return {
+    twoSum: [],
+    missingNum: 0,
+    maxProfit: 0
+  };
+}`,
+        testCases: [
+            {
+                input: [[2, 7, 11, 15], 9, [3, 0, 1], [7, 1, 5, 3, 6, 4]],
+                expected: { twoSum: [0, 1], missingNum: 2, maxProfit: 5 }
+            }
+        ],
+        xpReward: 250,
+        isBoss: true,
+        isAdvanced: true
     },
 
     // ==================== WORLD 2: DELIVERY HUB ====================
@@ -958,6 +1129,146 @@ const LEVELS = [
         isBoss: true
     },
 
+    // ==================== WORLD 5.A: ADVANCED FILES (SUBLEVELS) ====================
+    {
+        id: "5.A.1",
+        world: 5,
+        name: "Valid Structure",
+        desc: "🔓 ADVANCED: Validate BST property.",
+        mission: "Check if a folder structure is a valid Binary Search Tree - each folder's name (number) must be greater than all names in its left subtree and less than all in its right. This is Validate BST!",
+        hint: "Track valid range [min, max] for each node. Pass updated bounds when recursing.",
+        reveal: "Validate BST - range propagation! Each node must be within valid bounds!",
+        starterCode: `function solve(tree) {
+  // tree = { val, left, right } or null
+  // Return true if valid BST
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ val: 2, left: { val: 1, left: null, right: null }, right: { val: 3, left: null, right: null } }], expected: true },
+            { input: [{ val: 5, left: { val: 1, left: null, right: null }, right: { val: 4, left: null, right: null } }], expected: false }
+        ],
+        xpReward: 140,
+        isAdvanced: true
+    },
+    {
+        id: "5.A.2",
+        world: 5,
+        name: "Common Ancestor",
+        desc: "🔓 ADVANCED: Find lowest common ancestor.",
+        mission: "Find the deepest folder that contains both files p and q. This is the Lowest Common Ancestor (LCA) - the closest shared parent of two nodes.",
+        hint: "If current node is p or q, return it. Recurse left and right. If both return non-null, current is LCA.",
+        reveal: "LCA - post-order traversal! If both sides find targets, current node is the answer!",
+        starterCode: `function solve(tree, p, q) {
+  // Return value of lowest common ancestor of p and q
+  
+  return null;
+}`,
+        testCases: [
+            { input: [{ val: 3, left: { val: 5, left: { val: 6, left: null, right: null }, right: { val: 2, left: null, right: null } }, right: { val: 1, left: null, right: null } }, 5, 1], expected: 3 },
+            { input: [{ val: 3, left: { val: 5, left: { val: 6, left: null, right: null }, right: null }, right: null }, 5, 6], expected: 5 }
+        ],
+        xpReward: 150,
+        isAdvanced: true
+    },
+    {
+        id: "5.A.3",
+        world: 5,
+        name: "Mirror Check",
+        desc: "🔓 ADVANCED: Check if symmetric.",
+        mission: "Check if a folder structure is a mirror of itself - symmetric around its center. Left subtree should mirror right subtree.",
+        hint: "Compare left.left with right.right AND left.right with right.left recursively.",
+        reveal: "Symmetric Tree - compare mirrored pairs! A beautiful recursive pattern!",
+        starterCode: `function solve(tree) {
+  // Return true if tree is symmetric around center
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ val: 1, left: { val: 2, left: { val: 3, left: null, right: null }, right: null }, right: { val: 2, left: null, right: { val: 3, left: null, right: null } } }], expected: true },
+            { input: [{ val: 1, left: { val: 2, left: null, right: { val: 3, left: null, right: null } }, right: { val: 2, left: null, right: { val: 3, left: null, right: null } } }], expected: false }
+        ],
+        xpReward: 120,
+        isAdvanced: true
+    },
+    {
+        id: "5.A.4",
+        world: 5,
+        name: "Flatten Folders",
+        desc: "🔓 ADVANCED: Convert tree to list.",
+        mission: "Flatten a folder tree into a linked list in pre-order. Each node's right should point to next in pre-order, left should be null.",
+        hint: "Process right first (save it), then left. Connect current to flattened left, then to flattened right.",
+        reveal: "Flatten Tree - pre-order rewiring! A tricky but elegant transformation!",
+        starterCode: `function solve(tree) {
+  // Flatten tree in-place to right-leaning list
+  // Return array of values in order
+  
+  return [];
+}`,
+        testCases: [
+            { input: [{ val: 1, left: { val: 2, left: { val: 3, left: null, right: null }, right: null }, right: { val: 4, left: null, right: null } }], expected: [1, 2, 3, 4] },
+            { input: [{ val: 1, left: null, right: null }], expected: [1] }
+        ],
+        xpReward: 140,
+        isAdvanced: true
+    },
+    {
+        id: "5.A.5",
+        world: 5,
+        name: "Path Sum Target",
+        desc: "🔓 ADVANCED: Find path to target.",
+        mission: "Check if there's a root-to-leaf path where folder names (numbers) sum to a target. You must end at a leaf (no children)!",
+        hint: "Subtract current value from target. At leaf, check if remaining target is 0.",
+        reveal: "Path Sum - track remaining target! Base case is reaching a leaf with 0 remaining!",
+        starterCode: `function solve(tree, target) {
+  // Return true if any root-to-leaf path sums to target
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ val: 5, left: { val: 4, left: { val: 1, left: null, right: null }, right: null }, right: { val: 8, left: null, right: null } }, 10], expected: true },
+            { input: [{ val: 1, left: { val: 2, left: null, right: null }, right: null }, 1], expected: false }
+        ],
+        xpReward: 130,
+        isAdvanced: true
+    },
+    {
+        id: "5.A.6",
+        world: 5,
+        name: "Advanced Files Master",
+        desc: "🏆 SUB-BOSS: All advanced tree patterns.",
+        mission: "Master advanced tree operations! Return: 1) Is tree a valid BST, 2) Is tree symmetric, 3) Does any root-to-leaf path sum to target.",
+        hint: "Combine BST validation, symmetry check, and path sum!",
+        reveal: "You've conquered ADVANCED TREES - structured data mastery achieved!",
+        starterCode: `function solve(bstTree, symTree, pathTree, target) {
+  // Return: {
+  //   isValidBST: true if bstTree is valid BST
+  //   isSymmetric: true if symTree is symmetric
+  //   hasPathSum: true if pathTree has root-to-leaf sum = target
+  // }
+  
+  return {
+    isValidBST: false,
+    isSymmetric: false,
+    hasPathSum: false
+  };
+}`,
+        testCases: [
+            {
+                input: [
+                    { val: 2, left: { val: 1, left: null, right: null }, right: { val: 3, left: null, right: null } },
+                    { val: 1, left: { val: 2, left: null, right: null }, right: { val: 2, left: null, right: null } },
+                    { val: 5, left: { val: 3, left: null, right: null }, right: null },
+                    8
+                ],
+                expected: { isValidBST: true, isSymmetric: true, hasPathSum: true }
+            }
+        ],
+        xpReward: 250,
+        isBoss: true,
+        isAdvanced: true
+    },
+
     // ==================== WORLD 6: CITY TRANSIT ====================
     {
         id: "6.1",
@@ -1122,6 +1433,151 @@ const LEVELS = [
         ],
         xpReward: 220,
         isBoss: true
+    },
+
+    // ==================== WORLD 6.A: METRO EXPANSION (SUBLEVELS) ====================
+    {
+        id: "6.A.1",
+        world: 6,
+        name: "Clone Network",
+        desc: "🔓 ADVANCED: Deep copy a graph.",
+        mission: "Create an exact copy of the metro network. Each node in the new graph should be a NEW object with the same connections as the original. This is the Clone Graph problem!",
+        hint: "Use a hash map to track old node -> new node mapping. DFS or BFS to traverse and clone.",
+        reveal: "Clone Graph - DFS + hash map! Track visited with the mapping itself!",
+        starterCode: `function solve(graph) {
+  // graph = { val, neighbors: [...] }
+  // Return a deep clone of the graph
+  // Return array of all cloned node values
+  
+  return [];
+}`,
+        testCases: [
+            { input: [{ val: 1, neighbors: [{ val: 2, neighbors: [] }, { val: 3, neighbors: [] }] }], expected: [1, 2, 3] },
+            { input: [{ val: 1, neighbors: [] }], expected: [1] }
+        ],
+        xpReward: 150,
+        isAdvanced: true
+    },
+    {
+        id: "6.A.2",
+        world: 6,
+        name: "Count Districts",
+        desc: "🔓 ADVANCED: Number of islands.",
+        mission: "A city grid has land (1) and water (0). Count the number of islands (connected land regions). You can move up/down/left/right. This is the famous Number of Islands!",
+        hint: "DFS/BFS from each unvisited land cell. Mark visited cells. Count how many times you start a new search.",
+        reveal: "Number of Islands - flood fill! Each DFS start is a new island!",
+        starterCode: `function solve(grid) {
+  // grid = 2D array of 0s and 1s
+  // Return count of distinct islands
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[['1', '1', '0', '0'], ['1', '1', '0', '0'], ['0', '0', '1', '0'], ['0', '0', '0', '1']]], expected: 3 },
+            { input: [[['1', '0', '1'], ['0', '0', '0'], ['1', '0', '1']]], expected: 4 }
+        ],
+        xpReward: 140,
+        isAdvanced: true
+    },
+    {
+        id: "6.A.3",
+        world: 6,
+        name: "Build Order",
+        desc: "🔓 ADVANCED: Topological sort.",
+        mission: "Build a metro system with dependencies! Given stations and prerequisites [a, b] (a must be built before b), return a valid build order. Return [] if impossible (cycle exists).",
+        hint: "Kahn's algorithm: start with nodes having no incoming edges. Remove edges, add new zero-indegree nodes.",
+        reveal: "Topological Sort - process zero-indegree nodes! Works only on DAGs!",
+        starterCode: `function solve(numStations, prerequisites) {
+  // prerequisites = [[before, after], ...]
+  // Return valid build order, or [] if impossible
+  
+  return [];
+}`,
+        testCases: [
+            { input: [4, [[1, 0], [2, 0], [3, 1], [3, 2]]], expected: [0, 1, 2, 3] },
+            { input: [2, [[1, 0], [0, 1]]], expected: [] }
+        ],
+        xpReward: 160,
+        isAdvanced: true
+    },
+    {
+        id: "6.A.4",
+        world: 6,
+        name: "Cycle Detector",
+        desc: "🔓 ADVANCED: Find if cycle exists.",
+        mission: "Detect if the metro network contains a cycle. In a directed graph, can you start from a node and return to it? This prevents infinite loops in routing!",
+        hint: "Track three states: unvisited, visiting, visited. Cycle exists if you reach a 'visiting' node.",
+        reveal: "Cycle Detection - three-color DFS! Gray nodes in current path mean cycle!",
+        starterCode: `function solve(graph) {
+  // graph = { node: [neighbors], ... }
+  // Return true if cycle exists
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ 0: [1], 1: [2], 2: [0] }], expected: true },
+            { input: [{ 0: [1], 1: [2], 2: [] }], expected: false }
+        ],
+        xpReward: 140,
+        isAdvanced: true
+    },
+    {
+        id: "6.A.5",
+        world: 6,
+        name: "Network Clusters",
+        desc: "🔓 ADVANCED: Count connected components.",
+        mission: "How many separate metro networks exist? Given N stations and connections, count the number of connected components (groups of stations that can reach each other).",
+        hint: "DFS/BFS from each unvisited node. Each new search start is a new component. Or use Union-Find!",
+        reveal: "Connected Components - count DFS/BFS starts! Union-Find is another approach!",
+        starterCode: `function solve(n, connections) {
+  // n stations (0 to n-1)
+  // connections = [[a, b], ...] bidirectional
+  // Return number of separate networks
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [5, [[0, 1], [1, 2], [3, 4]]], expected: 2 },
+            { input: [4, [[0, 1], [2, 3], [1, 2]]], expected: 1 }
+        ],
+        xpReward: 130,
+        isAdvanced: true
+    },
+    {
+        id: "6.A.6",
+        world: 6,
+        name: "Advanced Metro Master",
+        desc: "🏆 SUB-BOSS: All advanced graph patterns.",
+        mission: "Master advanced graph operations! Return: 1) Number of islands in grid, 2) Whether cycle exists in graph, 3) Number of connected components.",
+        hint: "Combine flood fill, cycle detection, and component counting!",
+        reveal: "You've conquered ADVANCED GRAPHS - network mastery achieved!",
+        starterCode: `function solve(grid, directedGraph, n, connections) {
+  // Return: {
+  //   islandCount: number of islands in grid
+  //   hasCycle: true if directedGraph has cycle
+  //   componentCount: number of components in undirected graph
+  // }
+  
+  return {
+    islandCount: 0,
+    hasCycle: false,
+    componentCount: 0
+  };
+}`,
+        testCases: [
+            {
+                input: [
+                    [['1', '0'], ['0', '1']],
+                    { 0: [1], 1: [] },
+                    3,
+                    [[0, 1]]
+                ],
+                expected: { islandCount: 2, hasCycle: false, componentCount: 2 }
+            }
+        ],
+        xpReward: 250,
+        isBoss: true,
+        isAdvanced: true
     },
 
     // ==================== WORLD 7: SOCIAL NETWORK ====================
@@ -2133,6 +2589,1037 @@ const LEVELS = [
             { input: [[2, 3, 1, 1, 4], [[1, 2], [2, 3]], [[0, 30], [5, 10]]], expected: { canJump: true, maxActivities: 2, minRooms: 2 } }
         ],
         xpReward: 250,
+        isBoss: true
+    },
+
+    // ==================== WORLD 13: E-COMMERCE PLATFORM (TWO POINTERS) ====================
+    {
+        id: "13.1",
+        world: 13,
+        name: "Product Filter",
+        desc: "Filter products by price range.",
+        mission: "Your e-commerce site needs lightning-fast filtering! Given a SORTED array of product prices and a budget range [min, max], return all products within that price range. The array is already sorted - use this to your advantage for O(n) performance!",
+        hint: "Use two pointers: find where prices >= min starts, then collect until prices > max.",
+        reveal: "Two pointers on sorted data lets you find ranges in O(n) - no nested loops needed!",
+        starterCode: `function solve(prices, minBudget, maxBudget) {
+  // prices is SORTED ascending
+  // Return array of prices where minBudget <= price <= maxBudget
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[10, 20, 30, 40, 50], 15, 35], expected: [20, 30] },
+            { input: [[5, 10, 15, 20, 25], 10, 20], expected: [10, 15, 20] },
+            { input: [[100, 200, 300], 50, 150], expected: [100] }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "13.2",
+        world: 13,
+        name: "Remove Out of Stock",
+        desc: "Clean inventory in-place.",
+        mission: "Products with quantity 0 need to be removed from the display. Given an array of quantities, remove all zeros IN-PLACE and return the new length. Don't use extra space - modify the original array!",
+        hint: "Use slow/fast pointers: fast scans ahead, slow marks where to place non-zero values.",
+        reveal: "The slow/fast pointer pattern - one pointer reads, one writes. O(n) time, O(1) space!",
+        starterCode: `function solve(quantities) {
+  // Remove all 0s from quantities in-place
+  // Return the new length (count of non-zero items)
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[0, 1, 0, 3, 12]], expected: 3 },
+            { input: [[0, 0, 0]], expected: 0 },
+            { input: [[1, 2, 3]], expected: 3 }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "13.3",
+        world: 13,
+        name: "Shopping Cart Pairs",
+        desc: "Find items matching budget.",
+        mission: "A customer has a gift card! Given a SORTED list of product prices and a gift card value, find TWO products that exactly match the card amount. Return their indices [i, j].",
+        hint: "Start pointers at both ends. If sum too big, decrease right. If too small, increase left.",
+        reveal: "Two pointers from ends - the classic Two Sum on sorted arrays! O(n) vs O(n²)!",
+        starterCode: `function solve(prices, giftCard) {
+  // prices is SORTED
+  // Find two prices that sum to giftCard
+  // Return [index1, index2] or [] if not found
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[2, 7, 11, 15], 9], expected: [0, 1] },
+            { input: [[1, 2, 3, 4, 5], 8], expected: [2, 4] },
+            { input: [[1, 2, 3], 10], expected: [] }
+        ],
+        xpReward: 100
+    },
+    {
+        id: "13.4",
+        world: 13,
+        name: "Price Bracket",
+        desc: "Count products in range.",
+        mission: "How many products fall within a price bracket? Given a SORTED price list, count how many products cost between minPrice and maxPrice (inclusive). Do it faster than checking every element!",
+        hint: "Binary search to find the first valid price, then linear or another binary search for the end.",
+        reveal: "Binary search + two pointers - find boundaries in O(log n), count in O(1)!",
+        starterCode: `function solve(prices, minPrice, maxPrice) {
+  // prices is SORTED
+  // Return COUNT of prices in range [minPrice, maxPrice]
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[10, 20, 30, 40, 50, 60], 25, 45], expected: 2 },
+            { input: [[5, 10, 15, 20, 25, 30], 10, 25], expected: 4 },
+            { input: [[100, 200, 300], 400, 500], expected: 0 }
+        ],
+        xpReward: 110
+    },
+    {
+        id: "13.5",
+        world: 13,
+        name: "Bundle Deal",
+        desc: "Find three items for bundle.",
+        mission: "Create a bundle deal! Given SORTED product prices, find ALL unique combinations of 3 products that sum to the target bundle price. Return array of triplets [price1, price2, price3].",
+        hint: "Fix one element, then use two pointers on the remaining array. Skip duplicates!",
+        reveal: "3Sum problem - fix one, two-pointer the rest. O(n²) is optimal for this!",
+        starterCode: `function solve(prices, bundleTarget) {
+  // prices is SORTED
+  // Find all unique triplets that sum to bundleTarget
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[-1, 0, 1, 2, -1, -4], 0], expected: [[-1, -1, 2], [-1, 0, 1]] },
+            { input: [[1, 2, 3, 4, 5], 9], expected: [[1, 3, 5], [2, 3, 4]] }
+        ],
+        xpReward: 140
+    },
+    {
+        id: "13.6",
+        world: 13,
+        name: "Merge Catalogs",
+        desc: "Combine two sorted lists.",
+        mission: "Two suppliers sent their product catalogs (both sorted by price). Merge them into one sorted catalog. Use the fact that both are already sorted!",
+        hint: "Two pointers, one in each array. Always take the smaller element.",
+        reveal: "Merge from Merge Sort - compare fronts, take smaller. O(n+m) time!",
+        starterCode: `function solve(catalog1, catalog2) {
+  // Both catalogs are SORTED
+  // Return merged sorted catalog
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[1, 3, 5, 7], [2, 4, 6, 8]], expected: [1, 2, 3, 4, 5, 6, 7, 8] },
+            { input: [[1, 2, 3], [4, 5, 6]], expected: [1, 2, 3, 4, 5, 6] },
+            { input: [[], [1, 2, 3]], expected: [1, 2, 3] }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "13.7",
+        world: 13,
+        name: "Palindrome SKU",
+        desc: "Validate product codes.",
+        mission: "Product SKUs must be palindromes for special edition items. Check if a given SKU (string) reads the same forwards and backwards. Ignore case and non-alphanumeric characters.",
+        hint: "Two pointers from ends, moving toward center. Skip non-alphanumeric chars.",
+        reveal: "Two pointers meeting in middle - the classic palindrome check! O(n) time, O(1) space!",
+        starterCode: `function solve(sku) {
+  // Return true if sku is a palindrome
+  // Ignore non-alphanumeric, case-insensitive
+  
+  return false;
+}`,
+        testCases: [
+            { input: ["A man, a plan, a canal: Panama"], expected: true },
+            { input: ["race a car"], expected: false },
+            { input: ["Was it a car or a cat I saw"], expected: true }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "13.8",
+        world: 13,
+        name: "Container Loading",
+        desc: "Maximize shipping capacity.",
+        mission: "You have container walls of different heights. Find two walls that form a container holding the maximum water (products). The width is the distance between walls, height is the shorter wall.",
+        hint: "Start at ends. Move the shorter wall inward - can't do worse, might do better!",
+        reveal: "Container with Most Water - greedy two-pointer. Always move the limiting factor!",
+        starterCode: `function solve(heights) {
+  // heights[i] = height of wall at position i
+  // Return maximum area between any two walls
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[1, 8, 6, 2, 5, 4, 8, 3, 7]], expected: 49 },
+            { input: [[1, 1]], expected: 1 },
+            { input: [[4, 3, 2, 1, 4]], expected: 16 }
+        ],
+        xpReward: 130
+    },
+    {
+        id: "13.9",
+        world: 13,
+        name: "Move Clearance",
+        desc: "Organize sale items.",
+        mission: "Move all clearance items (marked as 0) to the end of the inventory array. Keep the relative order of non-clearance items. Do it IN-PLACE with O(1) extra space!",
+        hint: "Track where next non-zero should go. Swap elements into position.",
+        reveal: "Partition pattern - similar to QuickSort partitioning. Stable version exists too!",
+        starterCode: `function solve(inventory) {
+  // Move all 0s to end, maintain relative order of others
+  // Modify in-place, return the modified array
+  
+  return inventory;
+}`,
+        testCases: [
+            { input: [[0, 1, 0, 3, 12]], expected: [1, 3, 12, 0, 0] },
+            { input: [[0, 0, 1]], expected: [1, 0, 0] },
+            { input: [[1, 2, 3]], expected: [1, 2, 3] }
+        ],
+        xpReward: 100
+    },
+    {
+        id: "13.10",
+        world: 13,
+        name: "Stock Rebalance",
+        desc: "Calculate overflow storage.",
+        mission: "Your warehouse shelves have different heights. After a flood (orders), calculate how much excess inventory (water) is trapped between shelves. Each position can hold water up to the min of max heights on left and right.",
+        hint: "Two pointers from ends. Track maxLeft and maxRight. Process the smaller side.",
+        reveal: "Trapping Rain Water - the famous problem! Two pointers track boundaries. O(n) time!",
+        starterCode: `function solve(shelves) {
+  // shelves[i] = height of shelf at position i
+  // Return total water/inventory trapped
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]], expected: 6 },
+            { input: [[4, 2, 0, 3, 2, 5]], expected: 9 },
+            { input: [[1, 2, 3, 4]], expected: 0 }
+        ],
+        xpReward: 150
+    },
+    {
+        id: "13.11",
+        world: 13,
+        name: "Duplicate Detector",
+        desc: "Find repeated order ID.",
+        mission: "An array of order IDs from 1 to n appears n+1 times (one duplicate). Find the duplicate WITHOUT modifying the array and using only O(1) extra space. The duplicate can appear more than twice!",
+        hint: "Treat values as 'next node pointers'. It's like finding a cycle in a linked list!",
+        reveal: "Floyd's Cycle Detection (Tortoise and Hare) - brilliant use of two pointers!",
+        starterCode: `function solve(orderIds) {
+  // orderIds contains n+1 numbers in range [1, n]
+  // Exactly one number is duplicated
+  // Return the duplicate (O(1) space, don't modify array)
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[1, 3, 4, 2, 2]], expected: 2 },
+            { input: [[3, 1, 3, 4, 2]], expected: 3 },
+            { input: [[1, 1]], expected: 1 }
+        ],
+        xpReward: 160
+    },
+    {
+        id: "13.12",
+        world: 13,
+        name: "E-Commerce Master",
+        desc: "🏆 BOSS: Complete shopping system",
+        mission: "Build the ultimate e-commerce backend! Given products, a budget, and container heights, return: 1) Products in price range [min, max], 2) Two products summing to exact budget (indices), 3) Max container capacity from heights.",
+        hint: "Combine price filtering, two-sum, and container problems - all two-pointer techniques!",
+        reveal: "You've mastered TWO POINTERS - the art of efficient array traversal!",
+        starterCode: `function solve(prices, minPrice, maxPrice, budget, containerHeights) {
+  // prices is SORTED
+  // Return: {
+  //   inRange: products between minPrice and maxPrice
+  //   budgetPair: [i, j] indices summing to budget
+  //   maxContainer: max area from containerHeights
+  // }
+  
+  return {
+    inRange: [],
+    budgetPair: [],
+    maxContainer: 0
+  };
+}`,
+        testCases: [
+            {
+                input: [[10, 20, 30, 40, 50], 15, 35, 50, [1, 8, 6, 2, 5, 4, 8, 3, 7]],
+                expected: { inRange: [20, 30], budgetPair: [1, 2], maxContainer: 49 }
+            }
+        ],
+        xpReward: 300,
+        isBoss: true
+    },
+
+    // ==================== WORLD 14: STREAMING SERVICE (SLIDING WINDOW) ====================
+    {
+        id: "14.1",
+        world: 14,
+        name: "Peak Viewers",
+        desc: "Find max viewers in time window.",
+        mission: "Your streaming service tracks viewers per minute. Find the maximum total viewers in any K consecutive minutes. This is your peak load for server planning!",
+        hint: "Slide a window of size K. Add new element, remove old one. Track the maximum sum.",
+        reveal: "Fixed-size sliding window! Maintain running sum, slide in O(n) time!",
+        starterCode: `function solve(viewers, k) {
+  // Find maximum sum of any k consecutive elements
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[100, 200, 300, 400], 2], expected: 700 },
+            { input: [[2, 1, 5, 1, 3, 2], 3], expected: 9 },
+            { input: [[1, 1, 1, 1, 1], 3], expected: 3 }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "14.2",
+        world: 14,
+        name: "Unique Sessions",
+        desc: "Longest streak of unique users.",
+        mission: "Find the longest continuous viewing session where all user IDs are unique (no repeats). This measures engaged, diverse audience!",
+        hint: "Expand window while unique. When duplicate found, shrink from left until unique again.",
+        reveal: "Variable-size window with hash set! The classic 'longest substring without repeating'!",
+        starterCode: `function solve(userIds) {
+  // Return length of longest subarray with all unique elements
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [['a', 'b', 'c', 'a', 'b', 'c', 'd']], expected: 4 },
+            { input: [['a', 'a', 'a']], expected: 1 },
+            { input: [['a', 'b', 'c', 'd', 'e']], expected: 5 }
+        ],
+        xpReward: 100
+    },
+    {
+        id: "14.3",
+        world: 14,
+        name: "Binge Watch",
+        desc: "Longest same-genre streak.",
+        mission: "Find the longest consecutive streak of the same genre. Binge watchers love consistency!",
+        hint: "Track current genre and count. Reset when genre changes. Keep max.",
+        reveal: "Simple one-pass with state tracking! Window of same value.",
+        starterCode: `function solve(genres) {
+  // Return longest streak of same genre
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [['action', 'action', 'comedy', 'comedy', 'comedy', 'action']], expected: 3 },
+            { input: [['drama']], expected: 1 },
+            { input: [['a', 'b', 'c']], expected: 1 }
+        ],
+        xpReward: 70
+    },
+    {
+        id: "14.4",
+        world: 14,
+        name: "Ad Break",
+        desc: "Find best window for ads.",
+        mission: "Find all starting positions where a K-minute window has EXACTLY target viewers. Perfect for placing ads!",
+        hint: "Slide window, check if sum equals target. Collect all matching start indices.",
+        reveal: "Fixed window with exact match condition. O(n) single pass!",
+        starterCode: `function solve(viewers, k, target) {
+  // Return array of starting indices where sum of k elements equals target
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[1, 2, 3, 4, 5], 2, 5], expected: [1, 3] },
+            { input: [[1, 1, 1, 1], 2, 2], expected: [0, 1, 2] },
+            { input: [[1, 2, 3], 2, 10], expected: [] }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "14.5",
+        world: 14,
+        name: "Content Similar",
+        desc: "Find similar title patterns.",
+        mission: "Given a target title pattern, find all starting indices in the catalog where an anagram of the pattern exists. Use this for 'similar titles' feature!",
+        hint: "Fixed window of pattern length. Use char frequency comparison.",
+        reveal: "Find All Anagrams - sliding window with frequency map!",
+        starterCode: `function solve(catalog, pattern) {
+  // Return starting indices where anagram of pattern exists
+  
+  return [];
+}`,
+        testCases: [
+            { input: ['cbaebabacd', 'abc'], expected: [0, 6] },
+            { input: ['abab', 'ab'], expected: [0, 1, 2] },
+            { input: ['hello', 'xyz'], expected: [] }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "14.6",
+        world: 14,
+        name: "Bandwidth Peak",
+        desc: "Max load in any window.",
+        mission: "Find the maximum single viewer count in any K-minute window. You need to track spikes, not just sums! Return array of max for each window.",
+        hint: "Use a deque to maintain decreasing order. Pop smaller elements.",
+        reveal: "Sliding Window Maximum with monotonic deque! O(n) instead of O(n*k)!",
+        starterCode: `function solve(bandwidth, k) {
+  // Return array of maximum values in each window of size k
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[1, 3, -1, -3, 5, 3, 6, 7], 3], expected: [3, 3, 5, 5, 6, 7] },
+            { input: [[1, 2, 3, 4], 2], expected: [2, 3, 4] },
+            { input: [[9, 8, 7], 1], expected: [9, 8, 7] }
+        ],
+        xpReward: 150
+    },
+    {
+        id: "14.7",
+        world: 14,
+        name: "Min Buffer",
+        desc: "Smallest chunk to preload.",
+        mission: "Find the shortest continuous segment with at least targetViews total. This is the minimum content to buffer for guaranteed engagement!",
+        hint: "Expand until >= target, then shrink while still >= target. Track minimum length.",
+        reveal: "Minimum Size Subarray Sum - shrinking window pattern!",
+        starterCode: `function solve(views, targetViews) {
+  // Return length of shortest subarray with sum >= targetViews
+  // Return 0 if no such subarray exists
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[2, 3, 1, 2, 4, 3], 7], expected: 2 },
+            { input: [[1, 4, 4], 4], expected: 1 },
+            { input: [[1, 1, 1], 100], expected: 0 }
+        ],
+        xpReward: 110
+    },
+    {
+        id: "14.8",
+        world: 14,
+        name: "Genre Variety",
+        desc: "Max window with limited genres.",
+        mission: "Find the longest viewing session with at most K different genres. Variety is good, but not too much!",
+        hint: "Expand while genres <= K. Shrink when > K. Use frequency map.",
+        reveal: "Longest Substring with At Most K Distinct - classic variable window!",
+        starterCode: `function solve(genres, k) {
+  // Return length of longest subarray with at most k distinct genres
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [['a', 'a', 'b', 'c', 'b', 'b'], 2], expected: 4 },
+            { input: [['a', 'b', 'c'], 1], expected: 1 },
+            { input: [['a', 'a', 'a'], 3], expected: 3 }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "14.9",
+        world: 14,
+        name: "Trending Now",
+        desc: "Calculate moving average.",
+        mission: "Calculate the moving average of views over the last K time units. Return average after each new data point arrives.",
+        hint: "Maintain running sum. When window full, subtract oldest before adding new.",
+        reveal: "Classic moving average - the foundation of signal processing!",
+        starterCode: `function solve(views, k) {
+  // Return array of moving averages
+  // First k-1 entries average what's available so far
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[1, 10, 3, 5], 3], expected: [1, 5.5, 4.67, 6] },
+            { input: [[10, 20, 30], 2], expected: [10, 15, 25] }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "14.10",
+        world: 14,
+        name: "Quality Switch",
+        desc: "Min window with all resolutions.",
+        mission: "Find the minimum continuous segment that contains at least one of each required resolution (144p to 4K). This is the min buffer for adaptive streaming!",
+        hint: "Expand until all resolutions found. Shrink while still valid. Track minimum.",
+        reveal: "Minimum Window Substring - the hardest sliding window pattern!",
+        starterCode: `function solve(stream, requiredRes) {
+  // Return shortest substring containing all chars in requiredRes
+  // Return '' if impossible
+  
+  return '';
+}`,
+        testCases: [
+            { input: ['ADOBECODEBANC', 'ABC'], expected: 'BANC' },
+            { input: ['a', 'a'], expected: 'a' },
+            { input: ['a', 'aa'], expected: '' }
+        ],
+        xpReward: 160
+    },
+    {
+        id: "14.11",
+        world: 14,
+        name: "Watch Pattern",
+        desc: "Detect repeated sequences.",
+        mission: "Find all 10-character viewing patterns that occur more than once. These are the viral moments! Return unique patterns only.",
+        hint: "Slide 10-char window. Use hash set to track seen patterns.",
+        reveal: "Repeated DNA Sequences - fixed window with hashing!",
+        starterCode: `function solve(viewLog) {
+  // Return all 10-char sequences appearing more than once
+  
+  return [];
+}`,
+        testCases: [
+            { input: ['AAAAACCCCCAAAAACCCCCC'], expected: ['AAAAACCCCC'] },
+            { input: ['AAAAAAAAAAAAA'], expected: ['AAAAAAAAAA'] }
+        ],
+        xpReward: 100
+    },
+    {
+        id: "14.12",
+        world: 14,
+        name: "Streaming Master",
+        desc: "🏆 BOSS: Complete analytics",
+        mission: "Build the ultimate streaming analytics! Return: 1) Max viewers in K-window, 2) Longest unique user streak, 3) Shortest segment with sum >= target.",
+        hint: "Combine fixed max window, variable unique window, and min-sum window!",
+        reveal: "You've mastered SLIDING WINDOW - the art of sequential analysis!",
+        starterCode: `function solve(viewers, k, userIds, target) {
+  // Return: {
+  //   peakViewers: max sum of k consecutive viewers
+  //   longestUnique: length of longest all-unique userIds
+  //   minBuffer: shortest subarray with sum >= target
+  // }
+  
+  return {
+    peakViewers: 0,
+    longestUnique: 0,
+    minBuffer: 0
+  };
+}`,
+        testCases: [
+            {
+                input: [[2, 1, 5, 1, 3, 2], 3, ['a', 'b', 'c', 'a', 'b'], 7],
+                expected: { peakViewers: 9, longestUnique: 3, minBuffer: 2 }
+            }
+        ],
+        xpReward: 300,
+        isBoss: true
+    },
+
+    // ==================== WORLD 15: CALENDAR APP (INTERVALS) ====================
+    {
+        id: "15.1",
+        world: 15,
+        name: "Merge Meetings",
+        desc: "Combine overlapping events.",
+        mission: "Your calendar has overlapping meetings! Merge all overlapping intervals into non-overlapping ones. Two meetings overlap if one starts before the other ends.",
+        hint: "Sort by start time first. Then check if current overlaps with previous - merge if so.",
+        reveal: "Merge Intervals - sort then linear merge. O(n log n) due to sorting!",
+        starterCode: `function solve(meetings) {
+  // meetings = [[start, end], ...]
+  // Return merged non-overlapping intervals
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[[1, 3], [2, 6], [8, 10], [15, 18]]], expected: [[1, 6], [8, 10], [15, 18]] },
+            { input: [[[1, 4], [4, 5]]], expected: [[1, 5]] },
+            { input: [[[1, 4], [2, 3]]], expected: [[1, 4]] }
+        ],
+        xpReward: 100
+    },
+    {
+        id: "15.2",
+        world: 15,
+        name: "Add Event",
+        desc: "Insert without conflicts.",
+        mission: "Insert a new meeting into an already sorted, non-overlapping schedule. Merge if necessary to keep the schedule clean.",
+        hint: "Find where new event fits. Merge with overlapping intervals on both sides.",
+        reveal: "Insert Interval - handle left non-overlap, merge middle, keep right!",
+        starterCode: `function solve(schedule, newMeeting) {
+  // schedule is sorted and non-overlapping
+  // Insert newMeeting and merge if needed
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[[1, 3], [6, 9]], [2, 5]], expected: [[1, 5], [6, 9]] },
+            { input: [[[1, 2], [3, 5], [6, 7], [8, 10]], [4, 8]], expected: [[1, 2], [3, 10]] },
+            { input: [[], [5, 7]], expected: [[5, 7]] }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "15.3",
+        world: 15,
+        name: "Free Slots",
+        desc: "Find available time.",
+        mission: "Given a day's meetings (9 AM to 5 PM = [9, 17]), find all free time slots. Return gaps between meetings.",
+        hint: "Sort meetings, then find gaps between end of one and start of next.",
+        reveal: "Finding gaps - the inverse of merge intervals!",
+        starterCode: `function solve(meetings, dayStart, dayEnd) {
+  // Find free slots between dayStart and dayEnd
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[[10, 12], [14, 16]], 9, 17], expected: [[9, 10], [12, 14], [16, 17]] },
+            { input: [[[9, 17]], 9, 17], expected: [] },
+            { input: [[], 9, 17], expected: [[9, 17]] }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "15.4",
+        world: 15,
+        name: "Meeting Rooms",
+        desc: "Minimum rooms needed.",
+        mission: "Given meeting times, determine the minimum number of conference rooms required so no two meetings in the same room overlap.",
+        hint: "Count overlaps! Sort by start, use min-heap of end times, or count start/end events.",
+        reveal: "Meeting Rooms II - track concurrent meetings at any point!",
+        starterCode: `function solve(meetings) {
+  // Return minimum rooms needed
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[[0, 30], [5, 10], [15, 20]]], expected: 2 },
+            { input: [[[7, 10], [2, 4]]], expected: 1 },
+            { input: [[[0, 5], [5, 10], [10, 15]]], expected: 1 }
+        ],
+        xpReward: 130
+    },
+    {
+        id: "15.5",
+        world: 15,
+        name: "Cancel Conflicts",
+        desc: "Min events to remove.",
+        mission: "You're double-booked! Find the minimum number of meetings to cancel so remaining ones don't overlap. Keep as many meetings as possible!",
+        hint: "Greedy: sort by end time. Keep meetings that end earliest - they leave room for more!",
+        reveal: "Non-overlapping Intervals - greedy by end time is optimal!",
+        starterCode: `function solve(meetings) {
+  // Return minimum meetings to remove for no overlap
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[[1, 2], [2, 3], [3, 4], [1, 3]]], expected: 1 },
+            { input: [[[1, 2], [1, 2], [1, 2]]], expected: 2 },
+            { input: [[[1, 2], [2, 3]]], expected: 0 }
+        ],
+        xpReward: 110
+    },
+    {
+        id: "15.6",
+        world: 15,
+        name: "Team Sync",
+        desc: "Find common free time.",
+        mission: "Two employees have their schedules. Find all time slots where BOTH are free. Return the intersection of their free times.",
+        hint: "Two pointers on sorted intervals. Find overlaps between free slots.",
+        reveal: "Interval Intersection - two pointer merge technique!",
+        starterCode: `function solve(schedule1, schedule2) {
+  // Both schedules are sorted non-overlapping free slots
+  // Return intersection of free times
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[[0, 2], [5, 10], [13, 23]], [[1, 5], [8, 12], [15, 24]]], expected: [[1, 2], [5, 5], [8, 10], [15, 23]] },
+            { input: [[[1, 3]], [[4, 6]]], expected: [] },
+            { input: [[[1, 7]], [[2, 5]]], expected: [[2, 5]] }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "15.7",
+        world: 15,
+        name: "Booking Check",
+        desc: "Validate new event.",
+        mission: "Before adding a meeting, check if it conflicts with any existing meeting. Return true if the new meeting can be booked without overlap.",
+        hint: "Check each existing meeting. Conflict if newStart < existingEnd AND newEnd > existingStart.",
+        reveal: "My Calendar I - simple overlap check. Optimize with BST for many events!",
+        starterCode: `function solve(calendar, newMeeting) {
+  // Return true if newMeeting doesn't conflict with any in calendar
+  
+  return false;
+}`,
+        testCases: [
+            { input: [[[10, 20], [30, 40]], [15, 25]], expected: false },
+            { input: [[[10, 20], [30, 40]], [20, 30]], expected: true },
+            { input: [[], [10, 20]], expected: true }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "15.8",
+        world: 15,
+        name: "Double Booking",
+        desc: "Allow one overlap.",
+        mission: "Your calendar allows double-booking (max 2 meetings at same time) but NOT triple-booking. Return true if new meeting keeps this rule.",
+        hint: "Track overlaps. A triple-book happens when new overlaps with an existing overlap.",
+        reveal: "My Calendar II - track single and double bookings separately!",
+        starterCode: `function solve(calendar, overlaps, newMeeting) {
+  // calendar = existing meetings
+  // overlaps = already double-booked regions
+  // Return true if adding newMeeting won't cause triple-booking
+  
+  return false;
+}`,
+        testCases: [
+            { input: [[[10, 20]], [], [15, 25]], expected: true },
+            { input: [[[10, 20], [15, 25]], [[15, 20]], [5, 15]], expected: false }
+        ],
+        xpReward: 140
+    },
+    {
+        id: "15.9",
+        world: 15,
+        name: "Coverage Check",
+        desc: "Can we cover the range?",
+        mission: "Given intervals, check if they can cover the entire range [start, end]. You need complete coverage with no gaps!",
+        hint: "Sort by start. Greedily pick interval that starts <= current position and extends farthest.",
+        reveal: "Minimum Intervals to Cover Range - greedy extension!",
+        starterCode: `function solve(intervals, start, end) {
+  // Return true if intervals can cover [start, end] completely
+  
+  return false;
+}`,
+        testCases: [
+            { input: [[[0, 2], [1, 4], [3, 6]], 0, 5], expected: true },
+            { input: [[[0, 2], [4, 6]], 0, 5], expected: false },
+            { input: [[[0, 10]], 2, 5], expected: true }
+        ],
+        xpReward: 130
+    },
+    {
+        id: "15.10",
+        world: 15,
+        name: "Event Priority",
+        desc: "Best events to attend.",
+        mission: "Each event has a value (importance). You can only attend non-overlapping events. Find the maximum total value you can achieve!",
+        hint: "DP + binary search. For each event: skip it, or take it + best ending before its start.",
+        reveal: "Weighted Interval Scheduling - DP meets intervals!",
+        starterCode: `function solve(events) {
+  // events = [[start, end, value], ...]
+  // Return maximum total value of non-overlapping events
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [[[1, 3, 50], [2, 5, 20], [4, 6, 100]]], expected: 150 },
+            { input: [[[1, 2, 10], [2, 3, 20], [1, 3, 25]]], expected: 30 }
+        ],
+        xpReward: 160
+    },
+    {
+        id: "15.11",
+        world: 15,
+        name: "Recurring Events",
+        desc: "Handle repeat patterns.",
+        mission: "Generate the next N occurrences of a recurring event. Given start date, repeat pattern (daily/weekly), and count, list all occurrences.",
+        hint: "Iterate adding the repeat interval to start date N times.",
+        reveal: "Pattern generation - foundation for calendar systems!",
+        starterCode: `function solve(startDay, repeatDays, count) {
+  // startDay = first occurrence
+  // repeatDays = interval (7 for weekly)
+  // count = how many occurrences to generate
+  
+  return [];
+}`,
+        testCases: [
+            { input: [1, 7, 4], expected: [1, 8, 15, 22] },
+            { input: [5, 1, 3], expected: [5, 6, 7] },
+            { input: [10, 14, 2], expected: [10, 24] }
+        ],
+        xpReward: 70
+    },
+    {
+        id: "15.12",
+        world: 15,
+        name: "Calendar Master",
+        desc: "🏆 BOSS: Complete calendar system",
+        mission: "Build the ultimate calendar backend! Return: 1) Merged meetings, 2) Free slots in [9, 17], 3) Minimum rooms needed.",
+        hint: "Combine merge intervals, gap finding, and room counting!",
+        reveal: "You've mastered INTERVALS - the art of time-based operations!",
+        starterCode: `function solve(meetings) {
+  // Return: {
+  //   merged: non-overlapping merged meetings
+  //   freeSlots: gaps between 9 AM and 5 PM
+  //   minRooms: minimum conference rooms needed
+  // }
+  
+  return {
+    merged: [],
+    freeSlots: [],
+    minRooms: 0
+  };
+}`,
+        testCases: [
+            {
+                input: [[[10, 12], [11, 13], [14, 16]]],
+                expected: { merged: [[10, 13], [14, 16]], freeSlots: [[9, 10], [13, 14], [16, 17]], minRooms: 2 }
+            }
+        ],
+        xpReward: 300,
+        isBoss: true
+    },
+
+    // ==================== WORLD 16: SPELL CHECKER (TRIES) ====================
+    {
+        id: "16.1",
+        world: 16,
+        name: "Add to Dictionary",
+        desc: "Insert words into trie.",
+        mission: "Build the foundation of your spell checker! Implement a Trie class with an insert method. Insert words character by character, marking the end of each word.",
+        hint: "Each node has children (a-z) and an isEndOfWord flag. Traverse and create nodes as needed.",
+        reveal: "Trie insertion - O(m) where m is word length! No collisions like hash tables!",
+        starterCode: `function solve(words) {
+  // Build a trie from the words array
+  // Return the trie as a nested object
+  // Each node: { children: {}, isEnd: false }
+  
+  let root = { children: {}, isEnd: false };
+  
+  // Insert each word
+  
+  return root;
+}`,
+        testCases: [
+            { input: [['cat']], expected: { children: { c: { children: { a: { children: { t: { children: {}, isEnd: true } }, isEnd: false } }, isEnd: false } }, isEnd: false } },
+            { input: [['a', 'ab']], expected: { children: { a: { children: { b: { children: {}, isEnd: true } }, isEnd: true } }, isEnd: false } }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "16.2",
+        world: 16,
+        name: "Word Lookup",
+        desc: "Search for exact words.",
+        mission: "Check if a word exists in the dictionary. The word must be a complete word (marked as end), not just a prefix!",
+        hint: "Traverse the trie following each character. Return true only if path exists AND isEndOfWord is true.",
+        reveal: "Trie search - exact word matching in O(m) time!",
+        starterCode: `function solve(trie, word) {
+  // trie = { children: {...}, isEnd: bool }
+  // Return true if word exists as a complete word
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ children: { c: { children: { a: { children: { t: { children: {}, isEnd: true } }, isEnd: false } }, isEnd: false } }, isEnd: false }, 'cat'], expected: true },
+            { input: [{ children: { c: { children: { a: { children: { t: { children: {}, isEnd: true } }, isEnd: false } }, isEnd: false } }, isEnd: false }, 'ca'], expected: false }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "16.3",
+        world: 16,
+        name: "Prefix Match",
+        desc: "Check if prefix exists.",
+        mission: "Implement the startsWith method. Check if ANY word in the dictionary starts with the given prefix. This is the foundation of autocomplete!",
+        hint: "Similar to search, but don't require isEndOfWord. Just verify the path exists.",
+        reveal: "Prefix checking - what makes tries special! O(m) for any prefix length!",
+        starterCode: `function solve(trie, prefix) {
+  // Return true if any word in trie starts with prefix
+  
+  return false;
+}`,
+        testCases: [
+            { input: [{ children: { c: { children: { a: { children: { t: { children: {}, isEnd: true } }, isEnd: false } }, isEnd: false } }, isEnd: false }, 'ca'], expected: true },
+            { input: [{ children: { c: { children: { a: { children: { t: { children: {}, isEnd: true } }, isEnd: false } }, isEnd: false } }, isEnd: false }, 'dog'], expected: false }
+        ],
+        xpReward: 80
+    },
+    {
+        id: "16.4",
+        world: 16,
+        name: "Autocomplete",
+        desc: "Suggest word completions.",
+        mission: "Given a prefix, return ALL words that start with it. This is the core of Google's search suggestions! Return words in any order.",
+        hint: "Find the prefix node, then DFS to collect all complete words below it.",
+        reveal: "Autocomplete - traverse prefix path, then DFS to find all endings!",
+        starterCode: `function solve(words, prefix) {
+  // Return all words from the list that start with prefix
+  // Build trie first, then traverse
+  
+  return [];
+}`,
+        testCases: [
+            { input: [['cat', 'car', 'card', 'care', 'dog'], 'car'], expected: ['car', 'card', 'care'] },
+            { input: [['apple', 'app', 'application'], 'app'], expected: ['app', 'apple', 'application'] },
+            { input: [['hello'], 'hi'], expected: [] }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "16.5",
+        world: 16,
+        name: "Word Count",
+        desc: "Count words in dictionary.",
+        mission: "Count the total number of words stored in the trie. Traverse the entire structure and count nodes where isEndOfWord is true.",
+        hint: "DFS through all children, counting isEnd flags.",
+        reveal: "Tree traversal on a trie - same DFS pattern applies!",
+        starterCode: `function solve(trie) {
+  // Return total count of words in trie
+  
+  return 0;
+}`,
+        testCases: [
+            { input: [{ children: { a: { children: { b: { children: {}, isEnd: true } }, isEnd: true } }, isEnd: false }], expected: 2 },
+            { input: [{ children: {}, isEnd: false }], expected: 0 }
+        ],
+        xpReward: 70
+    },
+    {
+        id: "16.6",
+        world: 16,
+        name: "Delete Word",
+        desc: "Remove from dictionary.",
+        mission: "Remove a word from the trie. Be careful - only remove nodes that aren't used by other words! If 'cars' exists, deleting 'car' should only unmark isEnd, not remove nodes.",
+        hint: "Recursively check if a node can be deleted (no children and not end of another word).",
+        reveal: "Trie deletion - recursive cleanup, only remove unused nodes!",
+        starterCode: `function solve(words, wordToDelete) {
+  // Build trie from words, delete wordToDelete
+  // Return list of remaining words
+  
+  return [];
+}`,
+        testCases: [
+            { input: [['car', 'cars'], 'car'], expected: ['cars'] },
+            { input: [['car', 'card'], 'card'], expected: ['car'] },
+            { input: [['test'], 'test'], expected: [] }
+        ],
+        xpReward: 110
+    },
+    {
+        id: "16.7",
+        world: 16,
+        name: "Longest Prefix",
+        desc: "Find common prefix.",
+        mission: "Find the longest common prefix among all words. Stop when characters diverge or a word ends.",
+        hint: "Traverse trie while there's exactly one child and current node isn't end of a word.",
+        reveal: "LCP with trie - single path traversal until branch or word end!",
+        starterCode: `function solve(words) {
+  // Return longest common prefix of all words
+  
+  return '';
+}`,
+        testCases: [
+            { input: [['flower', 'flow', 'flight']], expected: 'fl' },
+            { input: [['dog', 'racecar', 'car']], expected: '' },
+            { input: [['test', 'testing', 'tested']], expected: 'test' }
+        ],
+        xpReward: 90
+    },
+    {
+        id: "16.8",
+        world: 16,
+        name: "Word Search Grid",
+        desc: "Find words in letter grid.",
+        mission: "Given a 2D grid of letters and a list of words, find all words that exist in the grid. You can move up/down/left/right. Each cell used once per word. This is the famous Word Search II!",
+        hint: "Build trie of words. DFS from each cell, checking against trie. Prune paths not in trie.",
+        reveal: "Word Search II - trie + backtracking! One of the hardest LeetCode problems!",
+        starterCode: `function solve(board, words) {
+  // Return all words from the list that can be found in the grid
+  
+  return [];
+}`,
+        testCases: [
+            { input: [[['o', 'a', 'a', 'n'], ['e', 't', 'a', 'e'], ['i', 'h', 'k', 'r'], ['i', 'f', 'l', 'v']], ['oath', 'pea', 'eat', 'rain']], expected: ['oath', 'eat'] },
+            { input: [[['a', 'b'], ['c', 'd']], ['ab', 'cd', 'ac']], expected: ['ab', 'ac'] }
+        ],
+        xpReward: 180
+    },
+    {
+        id: "16.9",
+        world: 16,
+        name: "Replace Words",
+        desc: "Shorten with root words.",
+        mission: "Replace words in a sentence with their shortest root from a dictionary. 'cattle' with root 'cat' becomes 'cat'. If no root exists, keep original.",
+        hint: "Build trie of roots. For each word, find shortest matching prefix that's a complete root.",
+        reveal: "Dictionary replacement - find shortest prefix that's a valid word!",
+        starterCode: `function solve(dictionary, sentence) {
+  // Replace each word with its shortest root if exists
+  
+  return '';
+}`,
+        testCases: [
+            { input: [['cat', 'bat', 'rat'], 'the cattle was rattled by the battery'], expected: 'the cat was rat by the bat' },
+            { input: [['a', 'aa', 'aaa'], 'a aa aaa aaaa'], expected: 'a a a a' }
+        ],
+        xpReward: 120
+    },
+    {
+        id: "16.10",
+        world: 16,
+        name: "Wildcard Search",
+        desc: "Search with '.' wildcard.",
+        mission: "Implement search that supports '.' as a wildcard matching any character. 'c.t' should match 'cat', 'cot', 'cut', etc.",
+        hint: "When you hit '.', try all children branches recursively.",
+        reveal: "Add Dot - branch on wildcards! The basis of regex matching!",
+        starterCode: `function solve(words, pattern) {
+  // Return true if pattern matches any word
+  // '.' matches any single character
+  
+  return false;
+}`,
+        testCases: [
+            { input: [['cat', 'dog', 'bat'], 'c.t'], expected: true },
+            { input: [['cat', 'dog', 'bat'], 'd.g'], expected: true },
+            { input: [['cat', 'dog', 'bat'], 'c..t'], expected: false }
+        ],
+        xpReward: 130
+    },
+    {
+        id: "16.11",
+        world: 16,
+        name: "Spell Suggestions",
+        desc: "Suggest corrections.",
+        mission: "Given a misspelled word, find all dictionary words within edit distance 1 (one character add, remove, or replace). These are your spell check suggestions!",
+        hint: "Generate all possible 1-edit variations and check each against the trie.",
+        reveal: "Edit distance 1 - generate candidates, validate against trie!",
+        starterCode: `function solve(dictionary, misspelled) {
+  // Return all dictionary words within 1 edit of misspelled
+  
+  return [];
+}`,
+        testCases: [
+            { input: [['cat', 'car', 'card', 'bat', 'cart'], 'crt'], expected: ['cart'] },
+            { input: [['hello', 'hallo', 'hullo'], 'hllo'], expected: ['hello', 'hallo', 'hullo'] }
+        ],
+        xpReward: 140
+    },
+    {
+        id: "16.12",
+        world: 16,
+        name: "Spell Master",
+        desc: "🏆 BOSS: Complete spell checker",
+        mission: "Build the ultimate spell checker! Return: 1) All words matching a prefix (autocomplete), 2) Whether a word exists, 3) All words matching a wildcard pattern.",
+        hint: "Combine autocomplete, exact search, and wildcard search into one powerful system!",
+        reveal: "You've mastered TRIES - the foundation of text processing and search engines!",
+        starterCode: `function solve(dictionary, prefix, exactWord, pattern) {
+  // Return: {
+  //   autocomplete: all words starting with prefix
+  //   exists: true if exactWord is in dictionary
+  //   wildcardMatches: all words matching pattern ('.' = any char)
+  // }
+  
+  return {
+    autocomplete: [],
+    exists: false,
+    wildcardMatches: []
+  };
+}`,
+        testCases: [
+            {
+                input: [['cat', 'car', 'card', 'care', 'dog'], 'car', 'cat', 'd.g'],
+                expected: { autocomplete: ['car', 'card', 'care'], exists: true, wildcardMatches: ['dog'] }
+            }
+        ],
+        xpReward: 300,
         isBoss: true
     }
 ];

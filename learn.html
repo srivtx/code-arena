@@ -525,6 +525,18 @@
                     <div class="topic-item" data-topic="maze-solver">Maze Solver</div>
                 </div>
             </div>
+
+            <div class="topic-category" data-category="array-techniques">
+                <div class="category-header">
+                    <span class="category-icon">👆</span>
+                    <span>Array Techniques</span>
+                </div>
+                <div class="topic-list">
+                    <div class="topic-item" data-topic="two-pointer">Two Pointers</div>
+                    <div class="topic-item" data-topic="sliding-window">Sliding Window</div>
+                    <div class="topic-item" data-topic="intervals">Interval Problems</div>
+                </div>
+            </div>
         </nav>
 
         <main class="content" id="content">
@@ -2335,6 +2347,204 @@ function fibDP(n) {
                     { title: '🔄 vs BFS/DFS', text: 'Backtracking finds A path, not shortest. Use BFS for shortest path in unweighted maze.' },
                     { title: '🎮 Applications', text: 'Game AI pathfinding, robot navigation, puzzle games, escape room algorithms.' }
                 ]
+            },
+            'two-pointer': {
+                title: 'Two Pointers',
+                icon: '👆',
+                timeComplexity: 'O(n)',
+                spaceComplexity: 'O(1)',
+                description: `
+                    <p>The <span class="highlight">Two Pointer</span> technique uses two pointers to traverse an array, 
+                    often from opposite ends or at different speeds, to solve problems in linear time.</p>
+                    
+                    <p><strong>Common Patterns</strong>:</p>
+                    <ul>
+                        <li><span class="highlight">Opposite ends</span> - Start from both ends, move inward</li>
+                        <li><span class="highlight">Same direction</span> - Fast and slow pointers</li>
+                        <li><span class="highlight">Two arrays</span> - Merge or compare sorted arrays</li>
+                    </ul>
+                `,
+                steps: [
+                    'Initialize two pointers (often left=0, right=n-1)',
+                    'While pointers haven\'t crossed:',
+                    'Check condition based on elements at both pointers',
+                    'Move one or both pointers based on comparison',
+                    'Often used on sorted arrays for O(n) instead of O(n²)'
+                ],
+                code: `// Two Sum on Sorted Array
+function twoSum(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    
+    while (left < right) {
+        const sum = arr[left] + arr[right];
+        
+        if (sum === target) {
+            return [left, right];
+        } else if (sum < target) {
+            left++;  // Need larger sum
+        } else {
+            right--; // Need smaller sum
+        }
+    }
+    return [-1, -1]; // Not found
+}
+
+// Container With Most Water
+function maxArea(heights) {
+    let left = 0, right = heights.length - 1;
+    let maxWater = 0;
+    
+    while (left < right) {
+        const width = right - left;
+        const height = Math.min(heights[left], heights[right]);
+        maxWater = Math.max(maxWater, width * height);
+        
+        if (heights[left] < heights[right]) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+    return maxWater;
+}`,
+                infoCards: [
+                    { title: '🎯 When to Use', text: 'Sorted arrays, finding pairs, palindromes, partitioning, or when O(n²) brute force needs optimization.' },
+                    { title: '⚡ Key Insight', text: 'Moving pointers based on conditions eliminates checking many possibilities, reducing complexity.' },
+                    { title: '💡 Classic Problems', text: 'Two Sum II, 3Sum, Container With Most Water, Trapping Rain Water, Valid Palindrome.' }
+                ]
+            },
+            'sliding-window': {
+                title: 'Sliding Window',
+                icon: '🪟',
+                timeComplexity: 'O(n)',
+                spaceComplexity: 'O(1) or O(k)',
+                description: `
+                    <p>The <span class="highlight">Sliding Window</span> technique maintains a window of elements 
+                    that slides across an array to find patterns or calculate running values efficiently.</p>
+                    
+                    <p><strong>Window Types</strong>:</p>
+                    <ul>
+                        <li><span class="highlight">Fixed size</span> - Window size k stays constant</li>
+                        <li><span class="highlight">Variable size</span> - Window grows/shrinks to satisfy condition</li>
+                    </ul>
+                `,
+                steps: [
+                    'Initialize window boundaries (left=0, right=0)',
+                    'Expand window by moving right pointer',
+                    'Add element to window state (sum, set, etc.)',
+                    'When condition violated: shrink from left',
+                    'Track result (max length, min sum, etc.)'
+                ],
+                code: `// Fixed Window: Max Sum of K Elements
+function maxSumSubarray(arr, k) {
+    let sum = 0;
+    // Build first window
+    for (let i = 0; i < k; i++) {
+        sum += arr[i];
+    }
+    
+    let maxSum = sum;
+    // Slide window
+    for (let i = k; i < arr.length; i++) {
+        sum += arr[i] - arr[i - k]; // Add new, remove old
+        maxSum = Math.max(maxSum, sum);
+    }
+    return maxSum;
+}
+
+// Variable Window: Longest Substring Without Repeats
+function lengthOfLongestSubstring(s) {
+    const seen = new Set();
+    let left = 0, maxLen = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        while (seen.has(s[right])) {
+            seen.delete(s[left]);
+            left++;
+        }
+        seen.add(s[right]);
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+    return maxLen;
+}`,
+                infoCards: [
+                    { title: '🎯 When to Use', text: 'Subarray/substring problems, running averages, finding patterns, or optimization over contiguous elements.' },
+                    { title: '⚡ Key Insight', text: 'Instead of recalculating from scratch, update window state incrementally by adding/removing elements.' },
+                    { title: '💡 Classic Problems', text: 'Maximum Sum Subarray, Longest Substring Without Repeating, Minimum Window Substring, Find All Anagrams.' }
+                ]
+            },
+            'intervals': {
+                title: 'Interval Problems',
+                icon: '📅',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(n)',
+                description: `
+                    <p><span class="highlight">Interval problems</span> deal with ranges represented as [start, end] pairs. 
+                    Common operations include merging, finding overlaps, and scheduling.</p>
+                    
+                    <p><strong>Key Insight</strong>:</p>
+                    <ul>
+                        <li><span class="highlight">Sort by start</span> - Then process linearly</li>
+                        <li><span class="highlight">Overlap check</span> - a overlaps b if a.start < b.end AND a.end > b.start</li>
+                    </ul>
+                `,
+                steps: [
+                    'Sort intervals by start time',
+                    'Initialize result with first interval',
+                    'For each subsequent interval:',
+                    'If overlaps with previous: merge by extending end',
+                    'If no overlap: add as new interval'
+                ],
+                code: `// Merge Overlapping Intervals
+function merge(intervals) {
+    if (!intervals.length) return [];
+    
+    // Sort by start time
+    intervals.sort((a, b) => a[0] - b[0]);
+    
+    const result = [intervals[0]];
+    
+    for (let i = 1; i < intervals.length; i++) {
+        const prev = result[result.length - 1];
+        const curr = intervals[i];
+        
+        if (curr[0] <= prev[1]) {
+            // Overlapping - merge
+            prev[1] = Math.max(prev[1], curr[1]);
+        } else {
+            // No overlap - add new
+            result.push(curr);
+        }
+    }
+    return result;
+}
+
+// Meeting Rooms II (Min Rooms Needed)
+function minMeetingRooms(intervals) {
+    const starts = intervals.map(i => i[0]).sort((a,b) => a-b);
+    const ends = intervals.map(i => i[1]).sort((a,b) => a-b);
+    
+    let rooms = 0, maxRooms = 0;
+    let s = 0, e = 0;
+    
+    while (s < starts.length) {
+        if (starts[s] < ends[e]) {
+            rooms++;
+            s++;
+        } else {
+            rooms--;
+            e++;
+        }
+        maxRooms = Math.max(maxRooms, rooms);
+    }
+    return maxRooms;
+}`,
+                infoCards: [
+                    { title: '🎯 When to Use', text: 'Calendar apps, scheduling, time-based events, range queries, or any problem with [start, end] pairs.' },
+                    { title: '⚡ Key Insight', text: 'Sorting by start time allows linear processing. Track overlaps by comparing current start to previous end.' },
+                    { title: '💡 Classic Problems', text: 'Merge Intervals, Insert Interval, Meeting Rooms I & II, Non-overlapping Intervals, Interval Intersection.' }
+                ]
             }
         };
 
@@ -2487,6 +2697,12 @@ function fibDP(n) {
                 currentSketch = new p5(sudokuSketch, 'vizCanvas');
             } else if (topicId === 'maze-solver') {
                 currentSketch = new p5(mazeSketch, 'vizCanvas');
+            } else if (topicId === 'two-pointer') {
+                currentSketch = new p5(twoPointerSketch, 'vizCanvas');
+            } else if (topicId === 'sliding-window') {
+                currentSketch = new p5(slidingWindowSketch, 'vizCanvas');
+            } else if (topicId === 'intervals') {
+                currentSketch = new p5(intervalSketch, 'vizCanvas');
             }
         }
 
@@ -5833,6 +6049,365 @@ function fibDP(n) {
                 p.fill(0);
                 p.text('Current', 400, 137);
             }
+        };
+
+        // Two Pointer Visualization
+        let twoPointerSketch = function (p) {
+            let arr = [2, 7, 11, 15, 19, 22, 25, 30];
+            let target = 26;
+            let left = 0, right = arr.length - 1;
+            let running = false;
+            let found = false;
+            let foundPair = null;
+            const W = 600, H = 280;
+            const boxSize = 50;
+
+            p.setup = function () {
+                p.createCanvas(W, H);
+                p.textFont('JetBrains Mono');
+            };
+
+            window.startViz = function () {
+                left = 0;
+                right = arr.length - 1;
+                found = false;
+                foundPair = null;
+                running = true;
+            };
+
+            window.resetViz = function () {
+                left = 0;
+                right = arr.length - 1;
+                found = false;
+                foundPair = null;
+                running = false;
+            };
+
+            p.draw = function () {
+                p.background(245);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.LEFT, p.TOP);
+                p.text('Two Pointer - Two Sum (Target: ' + target + ')', 10, 10);
+                p.textSize(12);
+                p.text('Sum: arr[' + left + '] + arr[' + right + '] = ' + (arr[left] + arr[right]), 10, 30);
+
+                // Draw array boxes
+                let startX = (W - arr.length * (boxSize + 10)) / 2;
+                let y = 100;
+
+                for (let i = 0; i < arr.length; i++) {
+                    let x = startX + i * (boxSize + 10);
+
+                    // Color based on position
+                    if (foundPair && (i === foundPair[0] || i === foundPair[1])) {
+                        p.fill(100, 200, 100);
+                    } else if (i === left) {
+                        p.fill(100, 150, 255);
+                    } else if (i === right) {
+                        p.fill(255, 150, 100);
+                    } else if (i > left && i < right) {
+                        p.fill(200, 200, 220);
+                    } else {
+                        p.fill(150);
+                    }
+
+                    p.stroke(50);
+                    p.strokeWeight(2);
+                    p.rect(x, y, boxSize, boxSize, 8);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(14);
+                    p.text(arr[i], x + boxSize / 2, y + boxSize / 2);
+
+                    p.textSize(10);
+                    p.text('[' + i + ']', x + boxSize / 2, y + boxSize + 15);
+                }
+
+                // Draw pointers
+                p.textSize(12);
+                p.fill(100, 150, 255);
+                p.text('← L', startX + left * (boxSize + 10) + boxSize / 2, y - 15);
+                p.fill(255, 150, 100);
+                p.text('R →', startX + right * (boxSize + 10) + boxSize / 2, y - 15);
+
+                // Status
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                if (found) {
+                    p.fill(0, 150, 0);
+                    p.text('✓ Found! arr[' + foundPair[0] + '] + arr[' + foundPair[1] + '] = ' + target, W / 2, H - 40);
+                } else if (left >= right && running) {
+                    p.fill(200, 0, 0);
+                    p.text('✗ No pair found', W / 2, H - 40);
+                }
+
+                // Animation
+                if (running && !found && left < right && p.frameCount % 30 === 0) {
+                    let sum = arr[left] + arr[right];
+                    if (sum === target) {
+                        found = true;
+                        foundPair = [left, right];
+                        running = false;
+                    } else if (sum < target) {
+                        left++;
+                    } else {
+                        right--;
+                    }
+                }
+            };
+        };
+
+        // Sliding Window Visualization
+        let slidingWindowSketch = function (p) {
+            let arr = [2, 1, 5, 1, 3, 2, 8, 4, 3];
+            let k = 3;
+            let windowStart = 0;
+            let windowSum = 0;
+            let maxSum = 0;
+            let maxStart = 0;
+            let running = false;
+            let phase = 0; // 0: build, 1: slide
+            const W = 600, H = 280;
+            const boxSize = 45;
+
+            p.setup = function () {
+                p.createCanvas(W, H);
+                p.textFont('JetBrains Mono');
+                // Initialize first window
+                for (let i = 0; i < k; i++) windowSum += arr[i];
+                maxSum = windowSum;
+            };
+
+            window.startViz = function () {
+                windowStart = 0;
+                windowSum = 0;
+                for (let i = 0; i < k; i++) windowSum += arr[i];
+                maxSum = windowSum;
+                maxStart = 0;
+                phase = 1;
+                running = true;
+            };
+
+            window.resetViz = function () {
+                windowStart = 0;
+                windowSum = 0;
+                for (let i = 0; i < k; i++) windowSum += arr[i];
+                maxSum = windowSum;
+                maxStart = 0;
+                phase = 0;
+                running = false;
+            };
+
+            p.draw = function () {
+                p.background(245);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.LEFT, p.TOP);
+                p.text('Sliding Window - Max Sum of ' + k + ' Elements', 10, 10);
+                p.textSize(12);
+                p.text('Window Sum: ' + windowSum + '  |  Max: ' + maxSum, 10, 30);
+
+                // Draw array boxes
+                let startX = (W - arr.length * (boxSize + 8)) / 2;
+                let y = 100;
+
+                for (let i = 0; i < arr.length; i++) {
+                    let x = startX + i * (boxSize + 8);
+                    let inWindow = i >= windowStart && i < windowStart + k;
+                    let isMax = i >= maxStart && i < maxStart + k;
+
+                    if (inWindow) {
+                        p.fill(100, 180, 255);
+                    } else {
+                        p.fill(200, 200, 220);
+                    }
+
+                    p.stroke(50);
+                    p.strokeWeight(2);
+                    p.rect(x, y, boxSize, boxSize, 6);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(14);
+                    p.text(arr[i], x + boxSize / 2, y + boxSize / 2);
+                }
+
+                // Draw window bracket
+                let wx = startX + windowStart * (boxSize + 8) - 5;
+                let ww = k * (boxSize + 8);
+                p.noFill();
+                p.stroke(100, 150, 255);
+                p.strokeWeight(3);
+                p.rect(wx, y - 10, ww, boxSize + 20, 8);
+
+                // Draw max window indicator
+                let mx = startX + maxStart * (boxSize + 8) - 5;
+                p.stroke(100, 200, 100);
+                p.strokeWeight(2);
+                p.drawingContext.setLineDash([5, 5]);
+                p.rect(mx, y + boxSize + 25, ww, 20, 4);
+                p.drawingContext.setLineDash([]);
+                p.fill(100, 200, 100);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.text('Max Window', mx + ww / 2, y + boxSize + 38);
+
+                // Animation
+                if (running && p.frameCount % 40 === 0) {
+                    if (windowStart + k < arr.length) {
+                        // Slide window
+                        windowSum = windowSum - arr[windowStart] + arr[windowStart + k];
+                        windowStart++;
+                        if (windowSum > maxSum) {
+                            maxSum = windowSum;
+                            maxStart = windowStart;
+                        }
+                    } else {
+                        running = false;
+                    }
+                }
+            };
+        };
+
+        // Interval Visualization
+        let intervalSketch = function (p) {
+            let intervals = [[1, 3], [2, 6], [8, 10], [15, 18]];
+            let merged = [];
+            let currentIdx = 0;
+            let running = false;
+            let done = false;
+            const W = 600, H = 280;
+            const scale = 25;
+            const barHeight = 25;
+
+            p.setup = function () {
+                p.createCanvas(W, H);
+                p.textFont('JetBrains Mono');
+            };
+
+            window.startViz = function () {
+                merged = [[...intervals[0]]];
+                currentIdx = 1;
+                done = false;
+                running = true;
+            };
+
+            window.resetViz = function () {
+                merged = [];
+                currentIdx = 0;
+                done = false;
+                running = false;
+            };
+
+            p.draw = function () {
+                p.background(245);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.LEFT, p.TOP);
+                p.text('Merge Intervals', 10, 10);
+
+                // Draw timeline
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.line(30, 70, W - 30, 70);
+
+                // Tick marks
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                for (let t = 0; t <= 20; t += 2) {
+                    let x = 30 + t * scale;
+                    p.line(x, 65, x, 75);
+                    p.noStroke();
+                    p.fill(100);
+                    p.text(t, x, 85);
+                    p.stroke(100);
+                }
+
+                // Draw original intervals
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                p.noStroke();
+                p.fill(0);
+                p.text('Input:', 10, 110);
+
+                for (let i = 0; i < intervals.length; i++) {
+                    let [s, e] = intervals[i];
+                    let x = 30 + s * scale;
+                    let w = (e - s) * scale;
+
+                    if (i === currentIdx && running) {
+                        p.fill(255, 200, 100);
+                    } else if (i < currentIdx) {
+                        p.fill(200, 200, 200);
+                    } else {
+                        p.fill(100, 150, 255);
+                    }
+                    p.rect(x, 105, w, barHeight, 4);
+                    p.fill(0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(10);
+                    p.text('[' + s + ',' + e + ']', x + w / 2, 115 + barHeight / 2);
+                }
+
+                // Draw merged intervals
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                p.fill(0);
+                p.text('Merged:', 10, 180);
+
+                for (let i = 0; i < merged.length; i++) {
+                    let [s, e] = merged[i];
+                    let x = 30 + s * scale;
+                    let w = (e - s) * scale;
+                    p.fill(100, 200, 100);
+                    p.rect(x, 175, w, barHeight, 4);
+                    p.fill(0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(10);
+                    p.text('[' + s + ',' + e + ']', x + w / 2, 185 + barHeight / 2);
+                }
+
+                if (done) {
+                    p.fill(0, 150, 0);
+                    p.textAlign(p.LEFT);
+                    p.textSize(12);
+                    p.text('✓ Merged ' + intervals.length + ' → ' + merged.length + ' intervals', 10, H - 30);
+                }
+
+                // Animation
+                if (running && p.frameCount % 50 === 0) {
+                    if (currentIdx < intervals.length) {
+                        let curr = intervals[currentIdx];
+                        let prev = merged[merged.length - 1];
+
+                        if (curr[0] <= prev[1]) {
+                            // Overlap - merge
+                            prev[1] = Math.max(prev[1], curr[1]);
+                        } else {
+                            // No overlap - add new
+                            merged.push([...curr]);
+                        }
+                        currentIdx++;
+                    } else {
+                        done = true;
+                        running = false;
+                    }
+                }
+            };
         };
 
         // Sidebar navigation
